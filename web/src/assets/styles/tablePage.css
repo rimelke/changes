@@ -1,0 +1,31 @@
+.tablePage table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tablePage thead {
+    border-bottom: 1px solid rgb(221, 221, 221);
+}
+
+.tablePage tbody tr:hover, .tablePage .selected {
+    background: #035d6b28;
+}
+
+.tablePage th {
+    padding: 8px;
+    color: #707070;
+}
+
+.tablePage td {
+    padding: 8px;
+    border-top: 1px dashed rgb(221, 221, 221);
+}
+
+.tablePage .buttons {
+    margin-top: 16px;
+    display: flex;
+}
+
+.tablePage .buttons * {
+    margin-right: 16px;
+}

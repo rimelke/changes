@@ -1,0 +1,35 @@
+#produtosNewPage fieldset {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgb(122, 122, 122);
+    margin-bottom: 16px;
+}
+
+#produtosNewPage .field-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+#produtosNewPage .three-field > * {
+    width: 30% !important;
+}
+
+#produtosNewPage .two-field > * {
+    width: 47.5% !important;
+}
+
+#produtosNewPage .input {
+    width: 100%;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid #000;
+}
+
+#produtosNewPage label {
+    margin-left: 8px;
+}
+
+#produtosNewPage .btn.thin {
+    padding: 4px 16px;
+}

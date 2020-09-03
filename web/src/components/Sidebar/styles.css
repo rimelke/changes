@@ -1,0 +1,32 @@
+#sidebar header {
+    padding: 16px;
+    color: #2c387b;
+}
+
+#sidebar h1 {
+    font-size: 20pt;
+}
+
+#sidebar li {
+    padding: 8px;
+}
+
+#sidebar li a {
+    align-items: center;
+    display: flex;
+    text-decoration: none;
+    color: #707070;
+    font-size: 12pt;
+}
+
+#sidebar li a:hover, #sidebar .activeNavBtn {
+    color: #035D6B;
+}
+
+#sidebar li svg {
+    display: block;
+}
+
+#sidebar li strong {
+    margin-left: 12px;
+}
