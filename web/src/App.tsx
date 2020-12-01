@@ -1,10 +1,13 @@
-import React from 'react';
-import './App.css';
-
+import { ChakraProvider } from '@chakra-ui/react'
+import React from 'react'
 import Routes from './routes'
 
 function App() {
-	return <Routes />
+	return (
+		<ChakraProvider>
+			<Routes />
+		</ChakraProvider>
+	)
 }
 
-export default App;
+export default App
