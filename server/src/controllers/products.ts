@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'
-import db from '../config/knex'
+import db from '../config/db'
 
 interface Cost {
     name: string
@@ -9,6 +9,11 @@ interface Cost {
 interface Fabric {
     fabric_id: number
     efficiency: number
+}
+
+interface Price {
+    price_id: number
+    value: number
 }
 
 export default {
@@ -29,8 +34,9 @@ export default {
         if (product) {
             const costs = await db('costs').where('product_id', id)
             const fabrics = await db('product_fabrics').where('product_id', id)
+            const prices = await db('product_prices').where('product_id', id)
 
-            res.json({...product, costs, fabrics})
+            res.json({...product, costs, fabrics, prices})
 
         } else res.status(400).json({message: 'Product not found'})
     },
@@ -42,7 +48,7 @@ export default {
             name,
             costs,
             fabrics,
-            price
+            prices
         } = req.body
 
         const trx = await db.transaction()
@@ -50,7 +56,7 @@ export default {
         let sumCosts = 0
 
         try {
-            const [product_id] = await trx('products').insert({ref, group_id, name, price})
+            const [product_id] = await trx('products').insert({ref, group_id, name})
 
             if (costs) await trx('costs').insert(costs.map((cost: Cost) => {
                 sumCosts += cost.value
@@ -79,12 +85,32 @@ export default {
                 await trx('product_fabrics').insert(parsedFabrics)
             }
 
-            if (costs || fabrics) {
-                let profit = null
+            if (prices && prices.length > 0) {
+                await trx('product_prices').insert(prices.map((price: Price) => ({
+                    product_id,
+                    profit: Number(((price.value - sumCosts) * 100 / sumCosts).toFixed(2)),
+                    ...price
+                })))
+            }
 
-                if (sumCosts && price && price > sumCosts) profit = Number(((price - sumCosts) * 100 / sumCosts).toFixed(2))
+            if (sumCosts) {
+                let profit = null
+                let price = null
+
+                const default_price = await trx('product_prices')
+                    .join('prices', 'product_prices.price_id', '=', 'prices.id')
+                    .select(['product_prices.*', 'prices.default'])
+                    .where('product_id', product_id)
+                    .where('prices.default', true)
+                    .first()
+
+                if (default_price) {
+                    if (default_price.value > sumCosts)
+                        profit = Number(((default_price.value - sumCosts) * 100 / sumCosts).toFixed(2))
+                    price = Number(default_price.value)
+                }
     
-                await trx('products').update({profit, cost: sumCosts}).where('id', product_id)    
+                await trx('products').update({profit, price, cost: sumCosts}).where('id', product_id)    
             }
 
             await trx.commit()
@@ -105,7 +131,7 @@ export default {
             name,
             costs,
             fabrics,
-            price
+            prices
         } = req.body
 
         const trx = await db.transaction()
@@ -144,9 +170,32 @@ export default {
                 await trx('product_fabrics').insert(parsedFabrics)
             }
 
-            let profit = null
+            await trx('product_prices').del().where('product_id', id)
+            if (prices && prices.length > 0) {
+                await trx('product_prices').insert(prices.map((price: Price) => ({
+                    product_id: id,
+                    profit: Number(((price.value - sumCosts) * 100 / sumCosts).toFixed(2)),
+                    ...price
+                })))
+            }
 
-            if (sumCosts && price && price > sumCosts) profit = Number(((price - sumCosts) * 100 / sumCosts).toFixed(2))
+            let profit = null
+            let price = null
+            if (sumCosts) {
+
+                const default_price = await trx('product_prices')
+                    .join('prices', 'product_prices.price_id', '=', 'prices.id')
+                    .select(['product_prices.*', 'prices.default'])
+                    .where('product_id', id)
+                    .where('prices.default', true)
+                    .first()
+
+                if (default_price) {
+                    if (default_price.value > sumCosts)
+                        profit = Number(((default_price.value - sumCosts) * 100 / sumCosts).toFixed(2))
+                    price = Number(default_price.value)
+                }
+            }
                 
             await trx('products').update({
                 ref,

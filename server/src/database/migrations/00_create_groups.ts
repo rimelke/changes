@@ -7,9 +7,9 @@ export async function up(knex: Knex) {
         tbl.string('name')
             .unique()
             .notNullable()
-        tbl.decimal('cost_avg')
-        tbl.decimal('price_avg')
-        tbl.decimal('profit_avg')
+        tbl.decimal('profit')
+        tbl.decimal('desired').notNullable()
+        tbl.decimal('minimum').notNullable()
     })
 }
 

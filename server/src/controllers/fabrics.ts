@@ -1,12 +1,17 @@
 import {Request, Response} from 'express'
-import db from '../config/knex'
+import db from '../config/db'
 
 export default {
     async index(req: Request, res: Response) {
         const { provider_id } = req.query
         let fabrics = []
-        if (provider_id) fabrics = await db('fabrics').where('provider_id', provider_id as string)
+        if (provider_id) fabrics = await db('fabrics')
+            .join('providers', 'fabrics.provider_id', '=', 'providers.id')
+            .select(['fabrics.*', 'providers.name as provider_name'])
+            .where('provider_id', provider_id as string)
         else fabrics = await db('fabrics')
+            .join('providers', 'fabrics.provider_id', '=', 'providers.id')
+            .select(['fabrics.*', 'providers.name as provider_name'])
         res.json(fabrics)
     },
 
@@ -22,6 +27,7 @@ export default {
 
             res.status(201).send()
         } catch (e) {
+            console.log(e)
             res.status(400).json({message: 'An error occured, try again'})
         }
     },
@@ -58,6 +64,11 @@ export default {
         const { id } = req.params
 
         try {
+            const products = await db('product_fabrics').where('fabric_id', id)
+
+            if (products.length > 0)
+                return res.status(400).json({message: 'There are products linked to this fabric'})
+
             await db('fabrics').del().where('id', id)
 
             res.status(200).send()

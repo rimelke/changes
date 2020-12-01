@@ -1,22 +1,56 @@
-import { Button, Flex, Heading, IconButton, Stack, Text, SelectProps } from "@chakra-ui/react"
+import { Button, Flex, Heading, IconButton, Stack, Text, 
+    Alert, AlertIcon, AlertDescription, AlertTitle, CloseButton } from "@chakra-ui/react"
 import { Form } from "@unform/web"
 import { useState } from "react"
 import { Input, MaskInput, Select } from "../components/Form"
 import withSidebar from "../hooks/withSidebar"
 import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
+import { useGet } from "../hooks/useGet"
+import api from "../services/api"
+
+interface Provider {
+    id: number
+    name: string
+}
+
+interface Fabric {
+    id: number
+    name: string
+    provider_id: number
+    provider_name: string
+    price: number
+    width: number
+    grammage: number
+}
 
 const Fabrics = () => {
     const [editingFabrics, setEditingFabrics] = useState<number[]>([])
+    const { data: providers } = useGet<Provider[]>('/providers')
+    const { data: fabrics, mutate } = useGet<Fabric[]>('/fabrics')
+    const [submitLoading, setSubmitLoading] = useState(false)
+    const [deleteError, setDeleteError] = useState(false)
 
-    const fabrics = [{
-        id: 1,
-        name: 'Courino',
-        provider_id: 1,
-        provider_name: 'Makro',
-        price: 23.30,
-        width: 1.45,
-        grammage: 234
-    }]
+    function handleSubmit(data: any) {
+        data.width = Number(data.width.replace(',', '.'))
+        data.grammage = Number(data.grammage)
+        data.price = Number(data.price.replace(',', '.'))
+        setSubmitLoading(true)
+        api.post('/fabrics', data)
+        .then(() => mutate())
+        .catch(e => console.log(e.response))
+        .finally(() => setSubmitLoading(false))
+    }
+
+    function handleDelete(id: number) {
+        api.delete(`/fabrics/${id}`)
+        .then(() => mutate())
+        .catch(e => {
+            if (e.response?.data?.message === 'There are products linked to this fabric')
+                return setDeleteError(true)
+
+            console.log(e.response)
+        })
+    }
 
     function handleEdit(id: number) {
         if (!editingFabrics.includes(id))
@@ -28,26 +62,36 @@ const Fabrics = () => {
     }
 
     function saveEdit(id: number, data: any) {
-
+        data.width = Number(data.width.replace(',', '.'))
+        data.grammage = Number(data.grammage)
+        data.price = Number(data.price.replace(',', '.'))
+        api.put(`/fabrics/${id}`, data)
+        .then(() => {
+            mutate()
+            cancelEdit(id)
+        }).catch(e => console.log(e.response))
     }
 
     return (
         <Flex flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Tecidos</Heading>
-            <Flex flexDir="column" mt={4} as={Form} onSubmit={() => {}}>
+            <Flex flexDir="column" mt={4} as={Form} onSubmit={handleSubmit}>
                 <Flex>
                     <Select isRequired name="provider_id" w={56} placeholder="Selecione o fornecedor">
-                        <option value={1}>Makro</option>
+                        {providers?.map(provider => (
+                            <option value={provider.id}>{provider.name}</option>
+                        ))}
                     </Select>
                     <Input isRequired w={80} ml={4} autoComplete="off" name="name" placeholder="Nome do tecido" />
                 </Flex>
                 <Flex mt={4}>
-                    <MaskInput isRequired w={32} name="grammage" mask="_" placeholder="Gramatura" format="###" />
+                    <MaskInput autoComplete="off" isRequired w={32} name="grammage" placeholder="Gramatura" format="###" />
                     <MaskInput
                         isRequired
                         ml={4}
                         w={32}
                         name="width"
+                        autoComplete="off"
                         placeholder="Largura"
                         decimalSeparator=","
                         decimalScale={2}
@@ -57,15 +101,24 @@ const Fabrics = () => {
                         isRequired
                         ml={4}
                         placeholder="Preço"
+                        autoComplete="off"
                         decimalSeparator=","
                         decimalScale={2}
                         fixedDecimalScale
                         name="price" />
-                    <Button colorScheme="teal" ml={4} type="submit">Cadastrar</Button>
+                    <Button isLoading={submitLoading} colorScheme="teal" ml={4} type="submit">Cadastrar</Button>
                 </Flex>
             </Flex>
+            {deleteError && (
+                <Alert w={750} mt={4} status="warning">
+                    <AlertIcon />
+                    <AlertTitle mr={2}>Não foi possível excluir este tecido!</AlertTitle>
+                    <AlertDescription>Ainda existem produtos atrelados a ele.</AlertDescription>
+                    <CloseButton onClick={() => setDeleteError(false)} position="absolute" right="8px" top="8px" />
+                </Alert>
+            )}
             <Stack mt={4}>
-                {fabrics.map(fabric => editingFabrics.includes(fabric.id) ? (
+                {fabrics?.map(fabric => editingFabrics.includes(fabric.id) ? (
                     <Flex
                         key={fabric.id}
                         alignItems="center"
@@ -78,8 +131,9 @@ const Fabrics = () => {
                         initialData={fabric}
                         as={Form}>
                         <Select isRequired name="provider_id" w={32} h={8}>
-                            <option value={1}>Makro</option>
-                            <option value={2}>Pettenati</option>
+                            {providers?.map(provider => (
+                                <option value={provider.id}>{provider.name}</option>
+                            ))}
                         </Select>
                         <Input isRequired w={44} h={8} name="name" placeholder="Nome do tecido" />
                         <MaskInput isRequired h={8} w={20} name="grammage" mask="_" placeholder="Gram." format="###" />
@@ -129,20 +183,21 @@ const Fabrics = () => {
                         <Text>{fabric.provider_name}</Text>
                         <Text>{fabric.name}</Text>
                         <Text>{fabric.grammage} g/m²</Text>
-                        <Text>{fabric.width} m</Text>
+                        <Text>{fabric.width.toLocaleString('pt-BR', {minimumFractionDigits: 2})} m</Text>
                         <Text>{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Flex>
                             <IconButton
                                 size="sm"
                                 colorScheme="orange"
-                                aria-label="Editar fornecedor"
+                                aria-label="Editar tecido"
                                 onClick={() => handleEdit(fabric.id)}
                                 icon={<FiEdit />} />
                             <IconButton
                                 ml={1}
                                 size="sm"
                                 colorScheme="red"
-                                aria-label="Apagar fornecedor"
+                                aria-label="Apagar tecido"
+                                onClick={() => handleDelete(fabric.id)}
                                 icon={<FiTrash2 />} />
                         </Flex>
                     </Flex>

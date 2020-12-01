@@ -11,7 +11,8 @@ export async function up(knex: Knex) {
             .notNullable()
 
         tbl.string('name').notNullable()
-        tbl.decimal('grammage', 5, 3)
+        tbl.integer('grammage').notNullable()
+        tbl.decimal('width').notNullable()
         tbl.decimal('price').notNullable()
         tbl.decimal('final_price').notNullable()
     })
