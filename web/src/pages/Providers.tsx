@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react"
+import { Button, Flex, FormControl, FormLabel, Heading, IconButton, Stack, Text } from "@chakra-ui/react"
 import withSidebar from "../hooks/withSidebar"
 import { Form } from '@unform/web'
 import { Input, MaskInput } from "../components/Form"
@@ -34,9 +34,9 @@ const Providers = () => {
     return (
         <Flex flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Fornecedores</Heading>
-            <Flex mt={4} as={Form} onSubmit={() => {}}>
-                <Input w={80} autoComplete="off" name="name" placeholder="Nome do fornecedor" />
-                <MaskInput w={32} ml={4} name="tax" placeholder="Imposto (%)" suffix="%" />
+            <Flex alignItems="flex-end" mt={4} as={Form} onSubmit={() => {}}>
+                <Input w={80} isRequired autoComplete="off" name="name" placeholder="Digite o nome" />
+                <MaskInput w={32} isRequired ml={4} autoComplete="off" name="tax" placeholder="Imposto" suffix="%" />
                 <Button colorScheme="teal" ml={4} type="submit">Cadastrar</Button>
             </Flex>
             <Stack mt={4}>
@@ -52,13 +52,14 @@ const Providers = () => {
                         onSubmit={data => saveEdit(provider.id, data)}
                         initialData={provider}
                         as={Form}>
-                        <Input w={300} h={8} name="name" placeholder="Nome do fornecedor" />
-                        <MaskInput suffix="%" w={100} h={8} name="tax" placeholder="Imposto" />
+                        <Input isRequired w={300} h={8} name="name" placeholder="Nome do fornecedor" />
+                        <MaskInput isRequired suffix="%" w={100} h={8} name="tax" placeholder="Imposto" />
                         <Flex>
                             <IconButton
                                 size="sm"
                                 colorScheme="green"
                                 aria-label="Salvar edições"
+                                type="submit"
                                 icon={<FiCheck />} />
                             <IconButton
                                 ml={1}
