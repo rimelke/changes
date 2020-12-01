@@ -83,9 +83,7 @@ const Providers = () => {
                         <Flex>
                             <IconButton
                                 size="sm"
-                                color="white"
-                                bgColor="yellow.500"
-                                _hover={{bgColor: 'yellow.600'}}
+                                colorScheme="orange"
                                 aria-label="Editar fornecedor"
                                 onClick={() => handleEdit(provider.id)}
                                 icon={<FiEdit />} />
