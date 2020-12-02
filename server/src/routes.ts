@@ -83,11 +83,7 @@ routes.put('/providers/:id', celebrate({
 }, {abortEarly: false}), providersControl.update)
 routes.delete('/providers/:id', providersControl.delete)
 
-routes.get('/fabrics', celebrate({
-    query: Joi.object().keys({
-        provider_id: Joi.number().positive().integer()
-    })
-}), fabricsControl.index)
+routes.get('/fabrics', fabricsControl.index)
 routes.post('/fabrics', celebrate({
     body: Joi.object().keys({
         provider_id: Joi.number().positive().integer().required(),

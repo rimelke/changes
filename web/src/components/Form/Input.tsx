@@ -20,7 +20,7 @@ const Input: React.FC<InputProps> = ({ name, ...rest }) => {
 		});
 	}, [fieldName, registerField]);
 
-	return <ChakraInput id={fieldName} ref={inputRef} defaultValue={defaultValue} {...rest} />
+	return <ChakraInput ref={inputRef} defaultValue={defaultValue} {...rest} />
 }
 
 export default Input

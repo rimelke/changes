@@ -1,4 +1,4 @@
-import { Flex, Heading, List, Text, IconButton, Button } from "@chakra-ui/react"
+import { Flex, Heading, List, Text, IconButton, Button, Select as ChakraSelect } from "@chakra-ui/react"
 import { Form } from "@unform/web"
 import { Input, MaskInput, Select } from "../components/Form"
 import withSidebar from "../hooks/withSidebar"
@@ -19,11 +19,39 @@ interface Cost {
     value: number
 }
 
+interface Provider {
+    id: number
+    tax: number
+    name: string
+}
+
+interface allFabric {
+    id: number
+    name: string
+    provider_id: number
+    provider_name: string
+    grammage: number
+    price: number
+    final_price: number
+}
+
+interface Fabric extends allFabric {
+    orderId: number
+    eficiency: number
+    subtotal: number
+}
+
 const NewProduct = () => {
     const { data: groups } = useGet<Group[]>('/groups')
+    const { data: providers } = useGet<Provider[]>('/providers')
+    const { data: allFabrics } = useGet<allFabric[]>('/fabrics')
+
     const [costs, setCosts] = useState<Cost[]>([])
     const [nextId, setNextId] = useState(1)
     const [editCosts, setEditCosts] = useState<number[]>([])
+
+    const [selectedProviderId, setSelectedProviderId] = useState<number | null>(null)
+    const [fabrics, setFabrics] = useState<Fabric[]>([])
 
     function handleAddCost(data: any) {
         data.id = nextId
@@ -51,15 +79,36 @@ const NewProduct = () => {
         cancelEditCost(id)
     }
 
+    function handleChangeProvider(value: string | number) {
+        if (value === '') setSelectedProviderId(null)
+        else setSelectedProviderId(Number(value))
+    }
+
+    function handleAddFabric(data: any) {
+        if (allFabrics) {
+            data.efficiency = Number(data.efficiency.replace(',', '.'))
+
+            let fabric: Fabric = {
+                ...allFabrics[data.fabric_index],
+                eficiency: data.efficiency,
+                orderId: nextId,
+                subtotal: allFabrics[data.fabric_index].final_price * data.efficiency
+            }
+
+            setFabrics([...fabrics, fabric])
+            setNextId(nextId + 1)
+        }
+    }
+
     return (
-        <Flex flexDir="column" as="main" flex={1} mt={4}>
+        <Flex pr={8} flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Novo Produto</Heading>
             <Flex justifyContent="space-between" mt={4}>
                 <Flex flexDir="column" as={Form} onSubmit={() => {}}>
                     <Flex>
                         <Select flex={3} placeholder="Selecione uma coleção" name="group_id">
                             {groups?.map(group => (
-                                <option value={group.id}>{group.name}</option>
+                                <option key={group.id} value={group.id}>{group.name}</option>
                             ))}
                         </Select>
                         <Input flex={1} autoComplete="off" ml={4} name="ref" placeholder="Referência" />
@@ -77,7 +126,7 @@ const NewProduct = () => {
                             name="price" />
                     </Flex>
                 </Flex>
-                <Flex mr={8} w={500} flexDir="column">
+                <Flex w={500} flexDir="column">
                     <List spacing={2} p={3} borderWidth="1px" borderRadius={7}>
                         {costs.map((cost, index) => editCosts.includes(cost.id) ? (
                             <Flex
@@ -159,6 +208,57 @@ const NewProduct = () => {
                         <Button colorScheme="teal" type="submit">Adicionar</Button>
                     </Flex>
                 </Flex>
+            </Flex>
+            <List mt={4} spacing={2} p={3} borderWidth="1px" borderRadius={7}>
+                {fabrics.map(fabric => (
+                    <Flex
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <Text>{fabric.provider_name}</Text>
+                        <Text>{fabric.name}</Text>
+                        <Text>{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text>{fabric.eficiency.toLocaleString('pt-BR')}</Text>
+                        <Text>{fabric.subtotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Flex>
+                            <IconButton
+                                size="sm"
+                                colorScheme="orange"
+                                aria-label="Editar custo"
+                                onClick={() => {}}
+                                icon={<FiEdit />} />
+                            <IconButton
+                                ml={1}
+                                size="sm"
+                                colorScheme="red"
+                                aria-label="Apagar custo"
+                                onClick={() => {}}
+                                icon={<FiTrash2 />} />
+                        </Flex>
+                    </Flex>
+                ))}
+            </List>
+            <Flex mt={4} justifyContent="space-between" as={Form} onSubmit={handleAddFabric}>
+                <ChakraSelect flex={3} onChange={evt => handleChangeProvider(evt.target.value)} placeholder="Todos fornecedores">
+                    {providers?.map(provider => (
+                        <option key={provider.id} value={provider.id}>{provider.name}</option>
+                    ))}
+                </ChakraSelect>
+                <Select ml={4} flex={4} name="fabric_index" placeholder="Selecione um tecido">
+                    {allFabrics
+                        ?.filter(fabric => selectedProviderId === null || fabric.provider_id === selectedProviderId)
+                        .map((fabric, index) => (
+                        <option key={fabric.id} value={index}>{fabric.name}</option>
+                    ))}
+                </Select>
+                <MaskInput
+                    ml={4}
+                    flex={1}
+                    name="efficiency"
+                    decimalSeparator=","
+                    decimalScale={3}
+                    fixedDecimalScale
+                    placeholder="Rendimento" />
+                <Button ml={4} flex={1} colorScheme="teal" type="submit">Adicionar</Button>
             </Flex>
         </Flex>
     )
