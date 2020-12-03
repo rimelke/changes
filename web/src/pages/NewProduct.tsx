@@ -1,10 +1,10 @@
-import { Flex, Heading, List, Text, IconButton, Button, Select as ChakraSelect } from "@chakra-ui/react"
+import { Flex, Heading, List, Text, IconButton, Button, Select as ChakraSelect, Box, Divider } from "@chakra-ui/react"
 import { Form } from "@unform/web"
 import { Input, MaskInput, Select } from "../components/Form"
 import withSidebar from "../hooks/withSidebar"
 import { useGet } from '../hooks/useGet'
 import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 interface Group {
     id: number
@@ -37,7 +37,7 @@ interface allFabric {
 
 interface Fabric extends allFabric {
     orderId: number
-    eficiency: number
+    efficiency: number
     subtotal: number
 }
 
@@ -52,6 +52,8 @@ const NewProduct = () => {
 
     const [selectedProviderId, setSelectedProviderId] = useState<number | null>(null)
     const [fabrics, setFabrics] = useState<Fabric[]>([])
+    const [editFabric, setEditFabric] = useState<number | null>(null)
+    const editFabricRef = useRef<any>(null)
 
     function handleAddCost(data: any) {
         data.id = nextId
@@ -90,7 +92,7 @@ const NewProduct = () => {
 
             let fabric: Fabric = {
                 ...allFabrics[data.fabric_index],
-                eficiency: data.efficiency,
+                efficiency: data.efficiency,
                 orderId: nextId,
                 subtotal: allFabrics[data.fabric_index].final_price * data.efficiency
             }
@@ -98,6 +100,33 @@ const NewProduct = () => {
             setFabrics([...fabrics, fabric])
             setNextId(nextId + 1)
         }
+    }
+
+    function handleDeleteFabric(id: number) {
+        setFabrics(fabrics.filter(fabric => fabric.orderId !== id))
+    }
+
+    function saveEditFabric(index: number, data: any) {
+        let tmp = [...fabrics]
+        data.efficiency = Number(data.efficiency.replace(',', '.'))
+        tmp[index] = {
+            ...tmp[index],
+            efficiency: data.efficiency,
+            subtotal: data.efficiency * tmp[index].final_price
+        }
+        setFabrics(tmp)
+        setEditFabric(null)
+    }
+
+    function handleEditFabric(id: number) {
+        if (editFabric !== null)
+            editFabricRef?.current?.submitForm()
+
+        setEditFabric(id)
+    }
+
+    function cancelEditFabric(id: number) {
+        setEditFabric(null)
     }
 
     return (
@@ -210,34 +239,80 @@ const NewProduct = () => {
                 </Flex>
             </Flex>
             <List mt={4} spacing={2} p={3} borderWidth="1px" borderRadius={7}>
-                {fabrics.map(fabric => (
+                <Flex alignItems="center" justifyContent="space-between">
+                    <Text flex={3} fontWeight="bold">Fornecedor</Text>
+                    <Text flex={5} fontWeight="bold">Nome</Text>
+                    <Text flex={2} fontWeight="bold" textAlign="center">Preço</Text>
+                    <Text flex={2} fontWeight="bold" textAlign="center">Preço final</Text>
+                    <Text flex={2} fontWeight="bold" textAlign="center">Rendimento</Text>
+                    <Text flex={2} fontWeight="bold" textAlign="center">Subtotal</Text>
+                    <Box flex={1} />
+                </Flex>
+                {fabrics.map((fabric, index) => editFabric === fabric.orderId ? (
+                    <Flex
+                        alignItems="center"
+                        as={Form}
+                        ref={editFabricRef}
+                        onSubmit={data => saveEditFabric(index, data)}
+                        initialData={fabric}
+                        justifyContent="space-between">
+                        <Text flex={3}>{fabric.provider_name}</Text>
+                        <Text flex={5}>{fabric.name}</Text>
+                        <Text flex={2} textAlign="center">{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <MaskInput
+                            placeholder="Rendimento"
+                            decimalSeparator=","
+                            decimalScale={3}
+                            flex={2}
+                            fixedDecimalScale
+                            name="efficiency" />
+                        <Text flex={2} textAlign="center">-</Text>
+                        <Flex flex={1}>
+                            <IconButton
+                                size="sm"
+                                colorScheme="green"
+                                aria-label="Salvar edições"
+                                type="submit"
+                                icon={<FiCheck />} />
+                            <IconButton
+                                ml={1}
+                                size="sm"
+                                colorScheme="red"
+                                aria-label="Cancelar edições"
+                                onClick={() => cancelEditFabric(fabric.orderId)}
+                                icon={<FiX />} />
+                        </Flex>
+                    </Flex>
+                ) : (
                     <Flex
                         alignItems="center"
                         justifyContent="space-between">
-                        <Text>{fabric.provider_name}</Text>
-                        <Text>{fabric.name}</Text>
-                        <Text>{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text>{fabric.eficiency.toLocaleString('pt-BR')}</Text>
-                        <Text>{fabric.subtotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Flex>
+                        <Text flex={3}>{fabric.provider_name}</Text>
+                        <Text flex={5}>{fabric.name}</Text>
+                        <Text flex={2} textAlign="center">{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{fabric.efficiency.toLocaleString('pt-BR', {minimumFractionDigits: 3})}</Text>
+                        <Text flex={2} textAlign="center">{fabric.subtotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Flex flex={1}>
                             <IconButton
                                 size="sm"
                                 colorScheme="orange"
                                 aria-label="Editar custo"
-                                onClick={() => {}}
+                                onClick={() => handleEditFabric(fabric.orderId)}
                                 icon={<FiEdit />} />
                             <IconButton
                                 ml={1}
                                 size="sm"
                                 colorScheme="red"
                                 aria-label="Apagar custo"
-                                onClick={() => {}}
+                                onClick={() => handleDeleteFabric(fabric.orderId)}
                                 icon={<FiTrash2 />} />
                         </Flex>
                     </Flex>
                 ))}
             </List>
-            <Flex mt={4} justifyContent="space-between" as={Form} onSubmit={handleAddFabric}>
+            <Flex as={Form} onSubmit={handleAddFabric} mt={4} justifyContent="space-between">
                 <ChakraSelect flex={3} onChange={evt => handleChangeProvider(evt.target.value)} placeholder="Todos fornecedores">
                     {providers?.map(provider => (
                         <option key={provider.id} value={provider.id}>{provider.name}</option>
@@ -253,6 +328,8 @@ const NewProduct = () => {
                 <MaskInput
                     ml={4}
                     flex={1}
+                    isRequired
+                    autoComplete="off"
                     name="efficiency"
                     decimalSeparator=","
                     decimalScale={3}
