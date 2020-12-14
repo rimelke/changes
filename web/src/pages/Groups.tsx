@@ -167,7 +167,13 @@ const Groups = () => {
                         <Text>{group.name}</Text>
                         <Text>{group.minimum.toLocaleString('pt-BR')} %</Text>
                         <Text>{group.desired.toLocaleString('pt-BR')} %</Text>
-                        <Text>{group.profit ? group.profit + ' %' : '-'}</Text>
+                        <Text fontWeight="bold" color={
+                            group.profit >= group.minimum
+                            ? group.profit >= group.desired
+                            ? 'green.500'
+                            : 'yellow.500'
+                            : 'red.500'
+                        }>{group.profit ? group.profit + ' %' : '-'}</Text>
                         <Flex>
                             <IconButton
                                 size="sm"

@@ -1,10 +1,13 @@
-import { Flex, Heading, List, Text, IconButton, Button, Select as ChakraSelect, Box, Divider } from "@chakra-ui/react"
+import { Flex, Heading, List, Text, IconButton, Button, Select as ChakraSelect,
+    Box, Alert, AlertIcon } from "@chakra-ui/react"
 import { Form } from "@unform/web"
 import { Input, MaskInput, Select } from "../components/Form"
 import withSidebar from "../hooks/withSidebar"
 import { useGet } from '../hooks/useGet'
 import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import api from "../services/api"
+import { useHistory } from "react-router-dom"
 
 interface Group {
     id: number
@@ -54,6 +57,34 @@ const NewProduct = () => {
     const [fabrics, setFabrics] = useState<Fabric[]>([])
     const [editFabric, setEditFabric] = useState<number | null>(null)
     const editFabricRef = useRef<any>(null)
+
+    const [price, setPrice] = useState<number | null>(null)
+    const [total, setTotal] = useState(0)
+    const [profit, setProfit] = useState<number | null>(null)
+    const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
+    const [fabricsWarn, setFabricsWarn] = useState(false)
+    const [costsWarn, setCostsWarn] = useState(false)
+
+    const history = useHistory()
+
+    useEffect(() => {
+        let tmp = 0
+        for (let cost of costs)
+            tmp += cost.value
+        
+        for (let fabric of fabrics)
+            tmp += fabric.subtotal
+
+        setTotal(tmp)
+        setFabricsWarn(false)
+        setCostsWarn(false)
+    }, [costs, fabrics])
+
+    useEffect(() => {
+        if (total !== 0 && price)
+            setProfit(Number(((price - total) * 100 / total).toFixed(0)))
+        else setProfit(null)
+    }, [total, price])
 
     function handleAddCost(data: any) {
         data.id = nextId
@@ -129,24 +160,55 @@ const NewProduct = () => {
         setEditFabric(null)
     }
 
+    function handleSubmit(data: any) {
+        if (fabrics.length === 0)
+            return setFabricsWarn(true)
+
+        if (costs.length === 0)
+            return setCostsWarn(true)
+
+        data.price = Number(data.price.replace(',', '.'))
+            
+        api.post('/products', {...data, 
+            fabrics: fabrics.map(fabric => ({id: fabric.id, efficiency: fabric.efficiency})), 
+            costs: costs.map(cost => ({name: cost.name, value: cost.value}))})
+        .then(res => history.push('/products'))
+        .catch(e => {
+            if (e.response)
+                console.log(e.response)
+            else console.log(e)
+        })
+    }
+
     return (
         <Flex pr={8} flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Novo Produto</Heading>
             <Flex justifyContent="space-between" mt={4}>
-                <Flex flexDir="column" as={Form} onSubmit={() => {}}>
+                <Flex flexDir="column" as={Form} onSubmit={handleSubmit}>
                     <Flex>
-                        <Select flex={3} placeholder="Selecione uma coleção" name="group_id">
+                        <Select 
+                            onChange={evt => {
+                                if (groups && groups[evt.target.selectedIndex - 1])
+                                    setSelectedGroup(groups[evt.target.selectedIndex - 1])
+                                else setSelectedGroup(null)
+                            }}
+                            isRequired
+                            flex={3}
+                            placeholder="Selecione uma coleção"
+                            name="group_id">
                             {groups?.map(group => (
                                 <option key={group.id} value={group.id}>{group.name}</option>
                             ))}
                         </Select>
-                        <Input flex={1} autoComplete="off" ml={4} name="ref" placeholder="Referência" />
+                        <Input isRequired flex={1} autoComplete="off" ml={4} name="ref" placeholder="Referência" />
                     </Flex>
                     <Flex mt={4}>
-                        <Input flex={3} name="name" autoComplete="off" placeholder="Nome do produto" />
+                        <Input isRequired flex={3} name="name" autoComplete="off" placeholder="Nome do produto" />
                         <MaskInput
+                            isRequired
                             flex={1}
                             ml={4}
+                            onChange={evt => setPrice(Number(evt.target.value.replace(',', '.')))}
                             placeholder="Preço"
                             decimalScale={2}
                             decimalSeparator=","
@@ -154,9 +216,39 @@ const NewProduct = () => {
                             autoComplete="off"
                             name="price" />
                     </Flex>
+                    <Flex mt={4} alignItems="center">
+                        <Button flex={4} colorScheme="teal" type="submit">Cadastrar</Button>
+                        <Box ml={4} px={4} flex={2}>
+                            <Text fontWeight="bold" textAlign="center">Total</Text>
+                            <Text fontWeight="bold" textAlign="center">
+                                {total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}
+                            </Text>
+                        </Box>
+                        <Box px={4} ml={4} flex={1}>
+                            <Text fontWeight="bold" textAlign="center">Lucro</Text>
+                            <Text
+                                color={
+                                    profit && selectedGroup
+                                    ? profit >= selectedGroup.minimum
+                                    ? profit >= selectedGroup.desired
+                                    ? 'green.500'
+                                    : 'yellow.500'
+                                    : 'red.500'
+                                    : 'black'
+                                }
+                                fontWeight="bold" textAlign="center">
+                                {profit ? profit + '%' : '-'}
+                            </Text>
+                        </Box>
+                    </Flex>
                 </Flex>
                 <Flex w={500} flexDir="column">
                     <List spacing={2} p={3} borderWidth="1px" borderRadius={7}>
+                        <Flex alignItems="center">
+                            <Text flex={4} fontWeight="bold">Nome</Text>
+                            <Text textAlign="center" flex={3} fontWeight="bold">Valor</Text>
+                            <Box w="68px" />
+                        </Flex>
                         {costs.map((cost, index) => editCosts.includes(cost.id) ? (
                             <Flex
                                 alignItems="center"
@@ -201,11 +293,14 @@ const NewProduct = () => {
                         ) : (
                             <Flex
                                 alignItems="center"
-                                key={cost.id}
-                                justifyContent="space-between">
-                                <Text>{cost.name}</Text>
-                                <Text>{cost.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                                <Flex>
+                                key={cost.id}>
+                                <Text flex={4}>{cost.name}</Text>
+                                <Text
+                                    textAlign="center"
+                                    flex={3}>
+                                    {cost.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}
+                                </Text>
+                                <Flex w="68px">
                                     <IconButton
                                         size="sm"
                                         colorScheme="orange"
@@ -236,6 +331,10 @@ const NewProduct = () => {
                             name="value" />
                         <Button colorScheme="teal" type="submit">Adicionar</Button>
                     </Flex>
+                    {costsWarn && (<Alert mt={4} status="warning">
+                        <AlertIcon />
+                        Você precisa adicionar ao menos um custo!
+                    </Alert>)}
                 </Flex>
             </Flex>
             <List mt={4} spacing={2} p={3} borderWidth="1px" borderRadius={7}>
@@ -246,12 +345,13 @@ const NewProduct = () => {
                     <Text flex={2} fontWeight="bold" textAlign="center">Preço final</Text>
                     <Text flex={2} fontWeight="bold" textAlign="center">Rendimento</Text>
                     <Text flex={2} fontWeight="bold" textAlign="center">Subtotal</Text>
-                    <Box flex={1} />
+                    <Box w="68px" />
                 </Flex>
                 {fabrics.map((fabric, index) => editFabric === fabric.orderId ? (
                     <Flex
                         alignItems="center"
                         as={Form}
+                        key={fabric.orderId}
                         ref={editFabricRef}
                         onSubmit={data => saveEditFabric(index, data)}
                         initialData={fabric}
@@ -268,7 +368,7 @@ const NewProduct = () => {
                             fixedDecimalScale
                             name="efficiency" />
                         <Text flex={2} textAlign="center">-</Text>
-                        <Flex flex={1}>
+                        <Flex w="68px">
                             <IconButton
                                 size="sm"
                                 colorScheme="green"
@@ -294,7 +394,7 @@ const NewProduct = () => {
                         <Text flex={2} textAlign="center">{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Text flex={2} textAlign="center">{fabric.efficiency.toLocaleString('pt-BR', {minimumFractionDigits: 3})}</Text>
                         <Text flex={2} textAlign="center">{fabric.subtotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Flex flex={1}>
+                        <Flex w="68px">
                             <IconButton
                                 size="sm"
                                 colorScheme="orange"
@@ -337,6 +437,10 @@ const NewProduct = () => {
                     placeholder="Rendimento" />
                 <Button ml={4} flex={1} colorScheme="teal" type="submit">Adicionar</Button>
             </Flex>
+            {fabricsWarn && (<Alert mt={4} status="warning">
+                <AlertIcon />
+                Você precisa adicionar ao menos um tecido!
+            </Alert>)}
         </Flex>
     )
 }

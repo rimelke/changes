@@ -5,7 +5,6 @@ import groupsControl from './controllers/groups'
 import productsControl from './controllers/products'
 import fabricsControl from './controllers/fabrics'
 import providersControl from './controllers/providers'
-import pricesControl from './controllers/prices'
 
 const routes = Router()
 
@@ -38,13 +37,10 @@ routes.post('/products', celebrate({
             value: Joi.number().positive().precision(2).required()
         })).min(1),
         fabrics: Joi.array().items(Joi.object().keys({
-            fabric_id: Joi.number().positive().integer().required(),
+            id: Joi.number().positive().integer().required(),
             efficiency: Joi.number().positive().precision(3).required(),
         })).min(1),
-        prices: Joi.array().items(Joi.object().keys({
-            price_id: Joi.number().positive().integer().required(),
-            value: Joi.number().positive().precision(2).required(),
-        })),
+        price: Joi.number().positive().precision(2).required()
     }).required()
 }, {abortEarly: false}), productsControl.create)
 routes.put('/products/:id', celebrate({
@@ -57,13 +53,10 @@ routes.put('/products/:id', celebrate({
             value: Joi.number().positive().precision(2).required()
         })).min(1),
         fabrics: Joi.array().items(Joi.object().keys({
-            fabric_id: Joi.number().positive().integer().required(),
+            id: Joi.number().positive().integer().required(),
             efficiency: Joi.number().positive().precision(3).required(),
         })).min(1),
-        prices: Joi.array().items(Joi.object().keys({
-            price_id: Joi.number().positive().integer().required(),
-            value: Joi.number().positive().precision(2).required(),
-        }))
+        price: Joi.number().positive().precision(2)
     }).required()
 }, {abortEarly: false}), productsControl.update)
 routes.delete('/products/:id', productsControl.delete)
@@ -103,34 +96,5 @@ routes.put('/fabrics/:id', celebrate({
     }).required()
 }, {abortEarly: false}), fabricsControl.update)
 routes.delete('/fabrics/:id', fabricsControl.delete)
-
-routes.get('/prices', pricesControl.index)
-routes.get('/prices/:id', celebrate({
-    params: Joi.object().keys({
-        id: Joi.number().positive().integer().required()
-    }).required()
-}, {abortEarly: false}), pricesControl.show)
-routes.post('/prices', celebrate({
-    body: Joi.object().keys({
-        name: Joi.string().required(),
-        expected: Joi.number().positive().required(),
-        default: Joi.boolean()
-    }).required()
-}, {abortEarly: false}), pricesControl.create)
-routes.put('/prices/:id', celebrate({
-    params: Joi.object().keys({
-        id: Joi.number().positive().integer().required()
-    }).required(),
-    body: Joi.object().keys({
-        name: Joi.string(),
-        expected: Joi.number().positive(),
-        default: Joi.boolean()
-    }).required()
-}, {abortEarly: false}), pricesControl.update)
-routes.delete('/prices/:id', celebrate({
-    params: Joi.object().keys({
-        id: Joi.number().positive().integer().required()
-    }).required()
-}, {abortEarly: false}), pricesControl.delete)
 
 export default routes

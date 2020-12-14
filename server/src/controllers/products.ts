@@ -1,5 +1,6 @@
 import {Request, Response} from 'express'
 import db from '../config/db'
+import calcGroupProfit from '../services/calcGroupProfit'
 
 interface Cost {
     name: string
@@ -7,22 +8,21 @@ interface Cost {
 }
 
 interface Fabric {
-    fabric_id: number
+    id: number
     efficiency: number
-}
-
-interface Price {
-    price_id: number
-    value: number
 }
 
 export default {
     async index(req: Request, res: Response) {
         const products = await db('products')
             .join('groups', 'products.group_id', '=', 'groups.id')
-            .select(['products.*', 'groups.name as group_name'])
+            .select([
+                'products.*',
+                'groups.minimum',
+                'groups.desired',
+                'groups.name as group_name'])
             .orderBy('products.updated_at', 'desc')
-
+            
         res.json(products)
     },
 
@@ -34,9 +34,8 @@ export default {
         if (product) {
             const costs = await db('costs').where('product_id', id)
             const fabrics = await db('product_fabrics').where('product_id', id)
-            const prices = await db('product_prices').where('product_id', id)
 
-            res.json({...product, costs, fabrics, prices})
+            res.json({...product, costs, fabrics})
 
         } else res.status(400).json({message: 'Product not found'})
     },
@@ -48,7 +47,7 @@ export default {
             name,
             costs,
             fabrics,
-            prices
+            price
         } = req.body
 
         const trx = await db.transaction()
@@ -56,7 +55,7 @@ export default {
         let sumCosts = 0
 
         try {
-            const [product_id] = await trx('products').insert({ref, group_id, name})
+            const [product_id] = await trx('products').insert({ref, group_id, name, price})
 
             if (costs) await trx('costs').insert(costs.map((cost: Cost) => {
                 sumCosts += cost.value
@@ -69,7 +68,7 @@ export default {
 
             if (fabrics) {
                 const parsedFabrics = await Promise.all(fabrics.map(async (fabric: Fabric) => {
-                    const { final_price } = await trx('fabrics').where('id', fabric.fabric_id).first()
+                    const { final_price } = await trx('fabrics').where('id', fabric.id).first()
                     const subtotal = Number((fabric.efficiency * final_price).toFixed(2))
 
                     sumCosts += subtotal
@@ -78,47 +77,28 @@ export default {
                         product_id,
                         final_price,
                         subtotal,
-                        ...fabric
+                        fabric_id: fabric.id,
+                        efficiency: fabric.efficiency
                     }
                 }))
 
                 await trx('product_fabrics').insert(parsedFabrics)
             }
 
-            if (prices && prices.length > 0) {
-                await trx('product_prices').insert(prices.map((price: Price) => ({
-                    product_id,
-                    profit: Number(((price.value - sumCosts) * 100 / sumCosts).toFixed(2)),
-                    ...price
-                })))
-            }
-
             if (sumCosts) {
-                let profit = null
-                let price = null
-
-                const default_price = await trx('product_prices')
-                    .join('prices', 'product_prices.price_id', '=', 'prices.id')
-                    .select(['product_prices.*', 'prices.default'])
-                    .where('product_id', product_id)
-                    .where('prices.default', true)
-                    .first()
-
-                if (default_price) {
-                    if (default_price.value > sumCosts)
-                        profit = Number(((default_price.value - sumCosts) * 100 / sumCosts).toFixed(2))
-                    price = Number(default_price.value)
-                }
+                const profit = Number(((price - sumCosts) * 100 / sumCosts).toFixed(0))
     
-                await trx('products').update({profit, price, cost: sumCosts}).where('id', product_id)    
+                await trx('products').update({profit, cost: sumCosts}).where('id', product_id)    
             }
+
+            await calcGroupProfit(group_id, trx)
 
             await trx.commit()
 
             res.status(201).send()
         } catch (e) {
             await trx.rollback(e)
-
+            console.log(e)
             res.status(400).json({message: 'An error occured, try again'})
         }
     },
@@ -131,7 +111,7 @@ export default {
             name,
             costs,
             fabrics,
-            prices
+            price
         } = req.body
 
         const trx = await db.transaction()
@@ -154,7 +134,7 @@ export default {
 
             if (fabrics) {
                 const parsedFabrics = await Promise.all(fabrics.map(async (fabric: Fabric) => {
-                    const { final_price } = await trx('fabrics').where('id', fabric.fabric_id).first()
+                    const { final_price } = await trx('fabrics').where('id', fabric.id).first()
                     const subtotal = Number((fabric.efficiency * final_price).toFixed(2))
 
                     sumCosts += subtotal
@@ -163,39 +143,18 @@ export default {
                         product_id: id,
                         final_price,
                         subtotal,
-                        ...fabric
+                        fabric_id: fabric.id,
+                        efficiency: fabric.efficiency
                     }
                 }))
 
                 await trx('product_fabrics').insert(parsedFabrics)
             }
 
-            await trx('product_prices').del().where('product_id', id)
-            if (prices && prices.length > 0) {
-                await trx('product_prices').insert(prices.map((price: Price) => ({
-                    product_id: id,
-                    profit: Number(((price.value - sumCosts) * 100 / sumCosts).toFixed(2)),
-                    ...price
-                })))
-            }
-
             let profit = null
-            let price = null
-            if (sumCosts) {
 
-                const default_price = await trx('product_prices')
-                    .join('prices', 'product_prices.price_id', '=', 'prices.id')
-                    .select(['product_prices.*', 'prices.default'])
-                    .where('product_id', id)
-                    .where('prices.default', true)
-                    .first()
-
-                if (default_price) {
-                    if (default_price.value > sumCosts)
-                        profit = Number(((default_price.value - sumCosts) * 100 / sumCosts).toFixed(2))
-                    price = Number(default_price.value)
-                }
-            }
+            if (sumCosts)
+                profit = Number(((price - sumCosts) * 100 / sumCosts).toFixed(0))
                 
             await trx('products').update({
                 ref,
@@ -206,6 +165,8 @@ export default {
                 profit,
                 updated_at: trx.fn.now()
             }).where('id', id)
+
+            await calcGroupProfit(group_id, trx)
 
             await trx.commit()
 
@@ -219,12 +180,22 @@ export default {
 
     async delete(req: Request, res: Response) {
         const { id } = req.params
+
+        const trx = await db.transaction()
         
         try {
-            await db('products').del().where('id', id)
+            const product = await trx('products').where('id', id).first()
+            await trx('products').del().where('id', id)
+
+            if (product)
+                await calcGroupProfit(product.group_id, trx)
+
+            await trx.commit()
     
             res.send()    
         } catch (e) {
+            await trx.rollback(e)
+            console.log(e)
             res.status(400).json({message: 'An error occured, try again'})
         }
     }
