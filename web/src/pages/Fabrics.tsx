@@ -1,5 +1,5 @@
 import { Button, Flex, Heading, IconButton, Stack, Text, 
-    Alert, AlertIcon, AlertDescription, AlertTitle, CloseButton } from "@chakra-ui/react"
+    Alert, AlertIcon, AlertDescription, AlertTitle, CloseButton, Box } from "@chakra-ui/react"
 import { Form } from "@unform/web"
 import { useState } from "react"
 import { Input, MaskInput, Select } from "../components/Form"
@@ -118,6 +118,20 @@ const Fabrics = () => {
                 </Alert>
             )}
             <Stack mt={4}>
+                <Flex
+                    alignItems="center"
+                    width={750}
+                    borderRadius={7}
+                    px={3}
+                    py={1}
+                    borderWidth="1px">
+                    <Text fontWeight="bold" flex={3}>Fornecedor</Text>
+                    <Text fontWeight="bold" flex={5}>Nome</Text>
+                    <Text textAlign="center" fontWeight="bold" flex={2}>Gramatura</Text>
+                    <Text textAlign="center" fontWeight="bold" flex={2}>Largura</Text>
+                    <Text textAlign="center" fontWeight="bold" flex={2}>Preço</Text>
+                    <Box w="68px" />
+                </Flex>
                 {fabrics?.map(fabric => editingFabrics.includes(fabric.id) ? (
                     <Flex
                         key={fabric.id}
@@ -126,6 +140,7 @@ const Fabrics = () => {
                         justifyContent="space-between"
                         borderRadius={7}
                         p={3}
+                        _hover={{bg: 'gray.50'}}
                         borderWidth="1px"
                         onSubmit={data => saveEdit(fabric.id, data)}
                         initialData={fabric}
@@ -176,16 +191,16 @@ const Fabrics = () => {
                         key={fabric.id}
                         alignItems="center"
                         width={750}
-                        justifyContent="space-between"
                         borderRadius={7}
+                        _hover={{bg: 'gray.50'}}
                         p={3}
                         borderWidth="1px">
-                        <Text>{fabric.provider_name}</Text>
-                        <Text>{fabric.name}</Text>
-                        <Text>{fabric.grammage} g/m²</Text>
-                        <Text>{fabric.width.toLocaleString('pt-BR', {minimumFractionDigits: 2})} m</Text>
-                        <Text>{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Flex>
+                        <Text flex={3}>{fabric.provider_name}</Text>
+                        <Text flex={5}>{fabric.name}</Text>
+                        <Text textAlign="center" flex={2}>{fabric.grammage} g/m²</Text>
+                        <Text textAlign="center" flex={2}>{fabric.width.toLocaleString('pt-BR', {minimumFractionDigits: 2})} m</Text>
+                        <Text textAlign="center" flex={2}>{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Flex w="68px">
                             <IconButton
                                 size="sm"
                                 colorScheme="orange"

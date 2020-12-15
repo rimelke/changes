@@ -1,6 +1,6 @@
 import { Button,Flex, Heading, IconButton,
     Stack, Text, Alert, AlertIcon, AlertDescription,
-    CloseButton, AlertTitle } from "@chakra-ui/react"
+    CloseButton, AlertTitle, Box } from "@chakra-ui/react"
 import withSidebar from "../hooks/withSidebar"
 import { Form } from '@unform/web'
 import { Input, MaskInput } from "../components/Form"
@@ -78,9 +78,7 @@ const Groups = () => {
                     autoComplete="off"
                     name="minimum"
                     placeholder="Lucro mínimo"
-                    decimalSeparator=","
-                    decimalScale={1}
-                    fixedDecimalScale
+                    decimalScale={0}
                     suffix=" %" />
                 <MaskInput
                     w={40}
@@ -89,9 +87,7 @@ const Groups = () => {
                     autoComplete="off"
                     name="desired"
                     placeholder="Lucro desejado"
-                    decimalSeparator=","
-                    decimalScale={1}
-                    fixedDecimalScale
+                    decimalScale={0}
                     suffix=" %" />
                 <Button isLoading={submitLoading} colorScheme="teal" ml={4} type="submit">Cadastrar</Button>
             </Flex>
@@ -104,6 +100,19 @@ const Groups = () => {
                 </Alert>
             )}
             <Stack mt={4}>
+                <Flex
+                    alignItems="center"
+                    width={600}
+                    borderRadius={7}
+                    px={3}
+                    py={1}
+                    borderWidth="1px">
+                    <Text fontWeight="bold" flex={2}>Nome</Text>
+                    <Text fontWeight="bold" textAlign="center" flex={1}>Mínimo</Text>
+                    <Text fontWeight="bold" textAlign="center" flex={1}>Desejado</Text>
+                    <Text fontWeight="bold" textAlign="center" flex={1}>Real</Text>
+                    <Box w="68px" />
+                </Flex>
                 {groups?.map(group => editingGroups.includes(group.id) ? (
                     <Flex
                         key={group.id}
@@ -113,6 +122,7 @@ const Groups = () => {
                         borderRadius={7}
                         p={3}
                         borderWidth="1px"
+                        _hover={{bg: 'gray.50'}}
                         onSubmit={data => saveEdit(group.id, data)}
                         initialData={group}
                         as={Form}>
@@ -124,9 +134,7 @@ const Groups = () => {
                             autoComplete="off"
                             name="minimum"
                             placeholder="Lucro mín."
-                            decimalSeparator=","
-                            decimalScale={1}
-                            fixedDecimalScale
+                            decimalScale={0}
                             suffix=" %" />
                         <MaskInput
                             w={28}
@@ -135,9 +143,7 @@ const Groups = () => {
                             autoComplete="off"
                             name="desired"
                             placeholder="Lucro des."
-                            decimalSeparator=","
-                            decimalScale={1}
-                            fixedDecimalScale
+                            decimalScale={0}
                             suffix=" %" />
                         <Flex>
                             <IconButton
@@ -160,21 +166,21 @@ const Groups = () => {
                         key={group.id}
                         alignItems="center"
                         width={600}
-                        justifyContent="space-between"
+                        _hover={{bg: 'gray.50'}}
                         borderRadius={7}
                         p={3}
                         borderWidth="1px">
-                        <Text>{group.name}</Text>
-                        <Text>{group.minimum.toLocaleString('pt-BR')} %</Text>
-                        <Text>{group.desired.toLocaleString('pt-BR')} %</Text>
-                        <Text fontWeight="bold" color={
+                        <Text flex={2}>{group.name}</Text>
+                        <Text textAlign="center" flex={1}>{group.minimum.toLocaleString('pt-BR')} %</Text>
+                        <Text textAlign="center" flex={1}>{group.desired.toLocaleString('pt-BR')} %</Text>
+                        <Text textAlign="center" flex={1} fontWeight="bold" color={
                             group.profit >= group.minimum
                             ? group.profit >= group.desired
                             ? 'green.500'
                             : 'yellow.500'
                             : 'red.500'
                         }>{group.profit ? group.profit + ' %' : '-'}</Text>
-                        <Flex>
+                        <Flex w="68px">
                             <IconButton
                                 size="sm"
                                 colorScheme="orange"
