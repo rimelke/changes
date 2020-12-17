@@ -1,7 +1,7 @@
 import { Flex, Heading, Stack, Text, IconButton, Button,
     AlertDialog, AlertDialogOverlay, AlertDialogContent,
     AlertDialogHeader, 
-    AlertDialogBody,
+    AlertDialogBody, Box,
     AlertDialogFooter} from "@chakra-ui/react"
 import withSidebar from "../hooks/withSidebar"
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
@@ -58,7 +58,7 @@ const Products = () => {
     }
 
     return (
-        <Flex flexDir="column" as="main" flex={1} mt={4}>
+        <Flex flexDir="column" as="main" flex={1} mt={4} pr={8}>
             <Heading size="lg" color="teal.500">Produtos</Heading>
             <Flex mt={4}>
                 <Button colorScheme="teal" to="/new/product" as={Link}>
@@ -90,29 +90,41 @@ const Products = () => {
                 </AlertDialogOverlay>
             </AlertDialog>
             <Stack mt={4}>
+                <Flex
+                    alignItems="center"
+                    borderRadius={7}
+                    px={3}
+                    py={1}
+                    borderWidth="1px">
+                    <Text fontWeight="bold" flex={2}>Coleção</Text>
+                    <Text fontWeight="bold" flex={1}>Ref.</Text>
+                    <Text fontWeight="bold" flex={3}>Nome</Text>
+                    <Text fontWeight="bold" textAlign="center" flex={1}>Custo</Text>
+                    <Text fontWeight="bold" textAlign="center" flex={1}>Preço</Text>
+                    <Text fontWeight="bold" textAlign="center" flex={1}>Lucro</Text>
+                    <Box w="68px" />
+                </Flex>
                 {products?.map(product => (
                     <Flex
                         key={product.id}
                         alignItems="center"
-                        width={750}
-                        justifyContent="space-between"
                         borderRadius={7}
                         p={3}
                         _hover={{bg: 'gray.50'}}
                         borderWidth="1px">
-                        <Text>{product.group_name}</Text>
-                        <Text>{product.ref}</Text>
-                        <Text>{product.name}</Text>
-                        <Text>{product.cost.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text>{product.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text fontWeight="bold" color={
+                        <Text flex={2}>{product.group_name}</Text>
+                        <Text flex={1}>{product.ref}</Text>
+                        <Text flex={3}>{product.name}</Text>
+                        <Text textAlign="center" flex={1}>{product.cost.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text textAlign="center" flex={1}>{product.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text textAlign="center" flex={1} fontWeight="bold" color={
                             product.profit >= product.minimum
                             ? product.profit >= product.desired
                             ? 'green.500'
                             : 'yellow.500'
                             : 'red.500'
                         }>{product.profit}%</Text>
-                        <Flex>
+                        <Flex w="68px">
                             <IconButton
                                 size="sm"
                                 colorScheme="orange"
