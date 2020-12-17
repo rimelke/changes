@@ -34,12 +34,12 @@ routes.post('/products', celebrate({
         name: Joi.string().required(),
         costs: Joi.array().items(Joi.object().keys({
             name: Joi.string().required(),
-            value: Joi.number().positive().precision(2).required()
+            value: Joi.number().precision(2).required()
         })).min(1),
         fabrics: Joi.array().items(Joi.object().keys({
             id: Joi.number().positive().integer().required(),
             efficiency: Joi.number().positive().precision(3).required(),
-        })).min(1),
+        })),
         price: Joi.number().positive().precision(2).required()
     }).required()
 }, {abortEarly: false}), productsControl.create)

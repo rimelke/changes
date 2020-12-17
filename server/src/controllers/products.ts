@@ -78,7 +78,7 @@ export default {
                 }
             }))
 
-            if (fabrics) {
+            if (fabrics && fabrics.length > 0) {
                 const parsedFabrics = await Promise.all(fabrics.map(async (fabric: Fabric) => {
                     const { final_price } = await trx('fabrics').where('id', fabric.id).first()
                     const subtotal = Number((fabric.efficiency * final_price).toFixed(2))
@@ -144,7 +144,7 @@ export default {
             
             await trx('product_fabrics').del().where('product_id', id)
 
-            if (fabrics) {
+            if (fabrics && fabrics.length > 0) {
                 const parsedFabrics = await Promise.all(fabrics.map(async (fabric: Fabric) => {
                     const { final_price } = await trx('fabrics').where('id', fabric.id).first()
                     const subtotal = Number((fabric.efficiency * final_price).toFixed(2))
@@ -198,6 +198,8 @@ export default {
         try {
             const product = await trx('products').where('id', id).first()
             await trx('products').del().where('id', id)
+            await trx('product_fabrics').del().where('product_id', id)
+            await trx('costs').del().where('product_id', id)
 
             if (product)
                 await calcGroupProfit(product.group_id, trx)
