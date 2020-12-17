@@ -22,8 +22,8 @@ This project focus to be a kind of dashboard, with costs, fabrics, products, pro
 
 ## :art: Layout
 <h1 align="center">
-    <img alt="Products" title="#Products" src="./assets/products.png" />
-        <img alt="Edit product" title="#EditProduct" src="./assets/edit.png" />
+    <img alt="Products" title="#Products" src="./assets/products_new.png" />
+    <img alt="Edit product" title="#EditProduct" src="./assets/edit.png" />
 </h1>
 
 ## **:wrench:  Technologies**
