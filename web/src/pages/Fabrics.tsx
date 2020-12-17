@@ -30,6 +30,8 @@ const Fabrics = () => {
     const [submitLoading, setSubmitLoading] = useState(false)
     const [deleteError, setDeleteError] = useState(false)
 
+    console.log(fabrics)
+
     function handleSubmit(data: any) {
         data.width = Number(data.width.replace(',', '.'))
         data.grammage = Number(data.grammage)

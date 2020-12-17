@@ -1,5 +1,7 @@
 import {Request, Response} from 'express'
 import db from '../config/db'
+import calcFabricProducts from '../services/calcFabricProducts'
+import calcGroupProfit from '../services/calcGroupProfit'
 
 export default {
     async index(req: Request, res: Response) {
@@ -42,6 +44,8 @@ export default {
                 const final_price = Number((price * (100 + test[0].tax) / 100).toFixed(2))
 
                 await trx('fabrics').update({final_price}).where('id', id)
+
+                await calcFabricProducts(Number(id), trx)
             }
 
             await trx.commit()

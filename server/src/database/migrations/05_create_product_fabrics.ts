@@ -2,6 +2,7 @@ import Knex from 'knex'
 
 export async function up(knex: Knex) {
     return knex.schema.createTable('product_fabrics', tbl => {
+        tbl.bigIncrements('id').primary()
         tbl.integer('product_id')
             .references('products.id')
             .onDelete('CASCADE')

@@ -1,5 +1,6 @@
 import {Request, Response} from 'express'
 import db from '../config/db'
+import calcProviderFabrics from '../services/calcProviderFabrics'
 
 export default {
     async index(req: Request, res: Response) {
@@ -20,11 +21,21 @@ export default {
     async update(req: Request, res: Response) {
         const { id } = req.params
 
+        const trx = await db.transaction()
+
         try {
-            await db('providers').update(req.body).where('id', id)
+            await trx('providers').update(req.body).where('id', id)
+
+            if (req.body.tax)
+                await calcProviderFabrics(Number(id), trx)
+
+            await trx.commit()
 
             res.status(200).send()
         } catch (e) {
+            await trx.rollback(e)
+
+            console.log(e)
             res.status(400).json({message: 'An error occured, try again'})
         }
     },
