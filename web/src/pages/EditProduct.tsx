@@ -220,9 +220,6 @@ const EditProduct = () => {
     }
 
     function handleSubmit(data: any) {
-        if (fabrics.length === 0)
-            return setFabricsWarn(true)
-
         if (costs.length === 0)
             return setCostsWarn(true)
 
@@ -250,7 +247,7 @@ const EditProduct = () => {
     
     return (
         <Flex pr={8} flexDir="column" as="main" flex={1} mt={4}>
-            <Heading size="lg" color="teal.500">Novo Produto</Heading>
+            <Heading size="lg" color="teal.500">Editar Produto ({product.ref} - {product.name})</Heading>
             <Flex justifyContent="space-between" mt={4}>
                 <Flex flexDir="column" as={Form} initialData={product} onSubmit={handleSubmit}>
                     <Flex>
