@@ -1,5 +1,5 @@
 import { Flex, Heading, List, Text, IconButton, Button, Select as ChakraSelect,
-    Box, Alert, AlertIcon } from "@chakra-ui/react"
+    Box, Alert, AlertIcon, Skeleton } from "@chakra-ui/react"
 import { Form } from "@unform/web"
 import { Input, MaskInput, Select } from "../components/Form"
 import withSidebar from "../hooks/withSidebar"
@@ -7,13 +7,36 @@ import { useGet } from '../hooks/useGet'
 import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 import { useEffect, useRef, useState } from "react"
 import api from "../services/api"
-import { useHistory } from "react-router-dom"
+import { useHistory, useParams } from "react-router-dom"
 
 interface Group {
     id: number
     name: string
     desired: number
     minimum: number
+}
+
+interface Product {
+    id: number
+    name: string
+    ref: string
+    group_id: number
+    price: number
+    profit: number
+    cost: number
+    costs: {
+        name: string
+        value: number
+    }[]
+    fabrics: {
+        efficiency: number
+        subtotal: number
+        name: string
+        provider_name: string
+        price: number
+        final_price: number
+        id: number
+    }[]
 }
 
 interface Cost {
@@ -38,14 +61,26 @@ interface allFabric {
     final_price: number
 }
 
-interface Fabric extends allFabric {
+interface Fabric {
     orderId: number
     efficiency: number
     subtotal: number
+    name: string
+    provider_name: string
+    price: number
+    final_price: number
+    id: number
 }
 
-const NewProduct = () => {
+interface Params {
+    id: string
+}
+
+const EditProduct = () => {
+    const { id } = useParams<Params>()
+
     const { data: groups } = useGet<Group[]>('/groups')
+    const { data: product } = useGet<Product>(`/products/${id}`)
     const { data: providers } = useGet<Provider[]>('/providers')
     const { data: allFabrics } = useGet<allFabric[]>('/fabrics')
 
@@ -66,6 +101,30 @@ const NewProduct = () => {
     const [costsWarn, setCostsWarn] = useState(false)
 
     const history = useHistory()
+
+    useEffect(() => {
+        if (product) {
+            setProfit(product.profit)
+            setTotal(product.cost)
+
+            let id = 1
+            setCosts(product.costs.map((cost, i) => ({
+                id: id + i,
+                name: cost.name,
+                value: cost.value
+            })))
+            id = product.costs.length
+
+            setFabrics(product.fabrics.map((fabric, i) => ({
+                ...fabric,
+                orderId: id + i
+            })))
+
+            id += product.fabrics.length
+            setNextId(id)
+            setPrice(product.price)
+        }
+    }, [product])
 
     useEffect(() => {
         let tmp = 0
@@ -169,7 +228,7 @@ const NewProduct = () => {
 
         data.price = Number(data.price.replace(',', '.'))
             
-        api.post('/products', {...data, 
+        api.put(`/products/${id}`, {...data, 
             fabrics: fabrics.map(fabric => ({id: fabric.id, efficiency: fabric.efficiency})), 
             costs: costs.map(cost => ({name: cost.name, value: cost.value}))})
         .then(res => history.push('/products'))
@@ -180,11 +239,20 @@ const NewProduct = () => {
         })
     }
 
+    if (!product)
+        return (
+            <Flex mt={4} flexDir="column" pr={8} flex={1} >
+                <Skeleton height="20px" w="100%" />
+                <Skeleton mt={2} height="20px" w="100%" />
+                <Skeleton mt={2} height="20px" w="100%" />
+            </Flex>
+        )
+    
     return (
         <Flex pr={8} flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Novo Produto</Heading>
             <Flex justifyContent="space-between" mt={4}>
-                <Flex flexDir="column" as={Form} onSubmit={handleSubmit}>
+                <Flex flexDir="column" as={Form} initialData={product} onSubmit={handleSubmit}>
                     <Flex>
                         <Select 
                             onChange={evt => {
@@ -217,7 +285,14 @@ const NewProduct = () => {
                             name="price" />
                     </Flex>
                     <Flex mt={4} alignItems="center">
-                        <Button flex={4} colorScheme="teal" type="submit">Cadastrar</Button>
+                        <Button flex={3} colorScheme="green" type="submit">Salvar</Button>
+                        <IconButton
+                            ml={2}
+                            size="md"
+                            colorScheme="red"
+                            aria-label="Cancelar edições"
+                            onClick={() => history.replace('/products')}
+                            icon={<FiX />} />
                         <Box ml={4} px={4} flex={2}>
                             <Text fontWeight="bold" textAlign="center">Total</Text>
                             <Text fontWeight="bold" textAlign="center">
@@ -386,8 +461,8 @@ const NewProduct = () => {
                     </Flex>
                 ) : (
                     <Flex
-                        key={fabric.orderId}
                         alignItems="center"
+                        key={fabric.orderId}
                         justifyContent="space-between">
                         <Text flex={3}>{fabric.provider_name}</Text>
                         <Text flex={5}>{fabric.name}</Text>
@@ -446,4 +521,4 @@ const NewProduct = () => {
     )
 }
 
-export default withSidebar(NewProduct)
+export default withSidebar(EditProduct)

@@ -33,7 +33,19 @@ export default {
 
         if (product) {
             const costs = await db('costs').where('product_id', id)
-            const fabrics = await db('product_fabrics').where('product_id', id)
+            const fabrics = await db('product_fabrics')
+                .join('fabrics', 'product_fabrics.fabric_id', '=', 'fabrics.id')
+                .join('providers', 'fabrics.provider_id', '=', 'providers.id')
+                .select([
+                    'product_fabrics.efficiency',
+                    'product_fabrics.final_price',
+                    'product_fabrics.subtotal',
+                    'fabrics.price',
+                    'fabrics.name',
+                    'fabrics.id',
+                    'providers.name as provider_name'
+                ])
+                .where('product_fabrics.product_id', id)
 
             res.json({...product, costs, fabrics})
 

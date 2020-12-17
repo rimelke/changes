@@ -6,7 +6,7 @@ import { Flex, Heading, Stack, Text, IconButton, Button,
 import withSidebar from "../hooks/withSidebar"
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
 import { useGet } from "../hooks/useGet"
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import api from "../services/api"
 import { useRef, useState } from "react"
 import { mutate } from "swr"
@@ -26,6 +26,7 @@ interface Product {
 
 const Products = () => {
     const { data: products, mutate } = useGet<Product[]>('/products')
+    const history = useHistory()
 
     const cancelRef = useRef(null)
 
@@ -60,7 +61,7 @@ const Products = () => {
         <Flex flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Produtos</Heading>
             <Flex mt={4}>
-                <Button colorScheme="teal" to="/products/new" as={Link}>
+                <Button colorScheme="teal" to="/new/product" as={Link}>
                     Novo
                 </Button>
             </Flex>
@@ -116,7 +117,7 @@ const Products = () => {
                                 size="sm"
                                 colorScheme="orange"
                                 aria-label="Editar tecido"
-                                onClick={() => {}}
+                                onClick={() => history.push(`/products/${product.id}`)}
                                 icon={<FiEdit />} />
                             <IconButton
                                 ml={1}
