@@ -14,8 +14,8 @@ export default async function calcFabricProducts(fabric_id: number, trx: Transac
     await Promise.all(products.map(async product => {
         await trx('product_fabrics')
             .update({
-                final_price: fabric.final_price,
-                subtotal: Number((fabric.final_price * product.efficiency).toFixed(2))
+                final_price: Number(fabric.final_price),
+                subtotal: Number((Number(fabric.final_price) * Number(product.efficiency)).toFixed(2))
             }).where('id', product.id)
     }))
 

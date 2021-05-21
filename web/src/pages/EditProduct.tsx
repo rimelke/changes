@@ -104,25 +104,29 @@ const EditProduct = () => {
 
     useEffect(() => {
         if (product) {
-            setProfit(product.profit)
-            setTotal(product.cost)
+            setProfit(Number(product.profit))
+            setTotal(Number(product.cost))
 
             let id = 1
             setCosts(product.costs.map((cost, i) => ({
                 id: id + i,
                 name: cost.name,
-                value: cost.value
+                value: Number(cost.value)
             })))
             id = product.costs.length
 
             setFabrics(product.fabrics.map((fabric, i) => ({
                 ...fabric,
+                efficiency: Number(fabric.efficiency),
+                final_price: Number(fabric.final_price),
+                price: Number(fabric.price),
+                subtotal: Number(fabric.subtotal),
                 orderId: id + i
             })))
 
             id += product.fabrics.length
             setNextId(id)
-            setPrice(product.price)
+            setPrice(Number(product.price))
         }
     }, [product])
 
@@ -249,7 +253,10 @@ const EditProduct = () => {
         <Flex pr={8} flexDir="column" as="main" flex={1} mt={4}>
             <Heading size="lg" color="teal.500">Editar Produto ({product.ref} - {product.name})</Heading>
             <Flex justifyContent="space-between" mt={4}>
-                <Flex flexDir="column" as={Form} initialData={product} onSubmit={handleSubmit}>
+                <Flex flexDir="column" as={Form} initialData={{
+                    ...product,
+                    price: Number(product.price)
+                }} onSubmit={handleSubmit}>
                     <Flex>
                         <Select 
                             onChange={evt => {

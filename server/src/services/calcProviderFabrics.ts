@@ -7,7 +7,7 @@ export default async function calcProviderFabrics(provider_id: number, trx: Tran
 
     for (let fabric of fabrics) {
         await trx('fabrics').update({
-            final_price: Number(((fabric.price * provider.tax / 100) + fabric.price).toFixed(2))
+            final_price: Number(((Number(fabric.price) * Number(provider.tax) / 100) + Number(fabric.price)).toFixed(2))
         }).where('id', fabric.id)
 
         await calcFabricProducts(fabric.id, trx)

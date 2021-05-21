@@ -171,15 +171,15 @@ const Groups = () => {
                         p={3}
                         borderWidth="1px">
                         <Text flex={2}>{group.name}</Text>
-                        <Text textAlign="center" flex={1}>{group.minimum.toLocaleString('pt-BR')} %</Text>
-                        <Text textAlign="center" flex={1}>{group.desired.toLocaleString('pt-BR')} %</Text>
+                        <Text textAlign="center" flex={1}>{Number(group.minimum).toLocaleString('pt-BR')} %</Text>
+                        <Text textAlign="center" flex={1}>{Number(group.desired).toLocaleString('pt-BR')} %</Text>
                         <Text textAlign="center" flex={1} fontWeight="bold" color={
-                            group.profit >= group.minimum
-                            ? group.profit >= group.desired
+                            Number(group.profit) >= Number(group.minimum)
+                            ? Number(group.profit) >= Number(group.desired)
                             ? 'green.500'
                             : 'yellow.500'
                             : 'red.500'
-                        }>{group.profit ? group.profit + ' %' : '-'}</Text>
+                        }>{group.profit ? Number(group.profit).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' %' : '-'}</Text>
                         <Flex w="68px">
                             <IconButton
                                 size="sm"

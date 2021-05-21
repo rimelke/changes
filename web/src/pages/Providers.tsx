@@ -89,7 +89,10 @@ const Providers = () => {
                         p={3}
                         borderWidth="1px"
                         onSubmit={data => saveEdit(provider.id, data)}
-                        initialData={provider}
+                        initialData={{
+                            ...provider,
+                            tax: Number(provider.tax)
+                        }}
                         as={Form}>
                         <Input isRequired w={300} h={8} name="name" placeholder="Nome do fornecedor" />
                         <MaskInput isRequired suffix="%" w={100} h={8} name="tax" placeholder="Imposto" />
@@ -119,7 +122,7 @@ const Providers = () => {
                         p={3}
                         borderWidth="1px">
                         <Text>{provider.name}</Text>
-                        <Text>{provider.tax}%</Text>
+                        <Text>{Number(provider.tax)}%</Text>
                         <Flex>
                             <IconButton
                                 size="sm"

@@ -7,8 +7,8 @@ export default async function calcGroupProfit(group_id: number, trx: Transaction
     let sumDifs = 0
     let profit = null
     for (let product of products) {
-        sumCosts += product.cost
-        sumDifs += product.price - product.cost
+        sumCosts += Number(product.cost)
+        sumDifs += Number(product.price) - Number(product.cost)
     }
 
     if (sumCosts !== 0)

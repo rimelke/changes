@@ -79,7 +79,7 @@ const Fabrics = () => {
                 <Flex>
                     <Select isRequired name="provider_id" w={56} placeholder="Selecione o fornecedor">
                         {providers?.map(provider => (
-                            <option value={provider.id}>{provider.name}</option>
+                            <option key={provider.id} value={provider.id}>{provider.name}</option>
                         ))}
                     </Select>
                     <Input isRequired w={80} ml={4} autoComplete="off" name="name" placeholder="Nome do tecido" />
@@ -143,11 +143,15 @@ const Fabrics = () => {
                         _hover={{bg: 'gray.50'}}
                         borderWidth="1px"
                         onSubmit={data => saveEdit(fabric.id, data)}
-                        initialData={fabric}
+                        initialData={{
+                            ...fabric,
+                            width: Number(fabric.width),
+                            price: Number(fabric.price)
+                        }}
                         as={Form}>
                         <Select isRequired name="provider_id" w={32} h={8}>
                             {providers?.map(provider => (
-                                <option value={provider.id}>{provider.name}</option>
+                                <option key={provider.id} value={provider.id}>{provider.name}</option>
                             ))}
                         </Select>
                         <Input isRequired w={44} h={8} name="name" placeholder="Nome do tecido" />
@@ -198,8 +202,8 @@ const Fabrics = () => {
                         <Text flex={3}>{fabric.provider_name}</Text>
                         <Text flex={5}>{fabric.name}</Text>
                         <Text textAlign="center" flex={2}>{fabric.grammage} g/m²</Text>
-                        <Text textAlign="center" flex={2}>{fabric.width.toLocaleString('pt-BR', {minimumFractionDigits: 2})} m</Text>
-                        <Text textAlign="center" flex={2}>{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text textAlign="center" flex={2}>{Number(fabric.width).toLocaleString('pt-BR', {minimumFractionDigits: 2})} m</Text>
+                        <Text textAlign="center" flex={2}>{Number(fabric.price).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Flex w="68px">
                             <IconButton
                                 size="sm"

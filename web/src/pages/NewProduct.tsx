@@ -82,7 +82,7 @@ const NewProduct = () => {
 
     useEffect(() => {
         if (total !== 0 && price)
-            setProfit(Number(((price - total) * 100 / total).toFixed(0)))
+            setProfit(Number(((price - total) * 100 / total).toFixed(1)))
         else setProfit(null)
     }, [total, price])
 
@@ -237,7 +237,7 @@ const NewProduct = () => {
                                     : 'black'
                                 }
                                 fontWeight="bold" textAlign="center">
-                                {profit ? profit + '%' : '-'}
+                                {profit ? Number(profit).toLocaleString('pt-BR', {maximumFractionDigits: 1, minimumFractionDigits: 1}) + '%' : '-'}
                             </Text>
                         </Box>
                     </Flex>
@@ -358,8 +358,8 @@ const NewProduct = () => {
                         justifyContent="space-between">
                         <Text flex={3}>{fabric.provider_name}</Text>
                         <Text flex={5}>{fabric.name}</Text>
-                        <Text flex={2} textAlign="center">{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text flex={2} textAlign="center">{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{Number(fabric.price).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{Number(fabric.final_price).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <MaskInput
                             placeholder="Rendimento"
                             decimalSeparator=","
@@ -391,8 +391,8 @@ const NewProduct = () => {
                         justifyContent="space-between">
                         <Text flex={3}>{fabric.provider_name}</Text>
                         <Text flex={5}>{fabric.name}</Text>
-                        <Text flex={2} textAlign="center">{fabric.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text flex={2} textAlign="center">{fabric.final_price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{Number(fabric.price).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text flex={2} textAlign="center">{Number(fabric.final_price).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Text flex={2} textAlign="center">{fabric.efficiency.toLocaleString('pt-BR', {minimumFractionDigits: 3})}</Text>
                         <Text flex={2} textAlign="center">{fabric.subtotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Flex w="68px">

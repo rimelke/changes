@@ -137,15 +137,15 @@ const Products = () => {
                         <Text flex={2}>{product.group_name}</Text>
                         <Text flex={1}>{product.ref}</Text>
                         <Text flex={3}>{product.name}</Text>
-                        <Text textAlign="center" flex={1}>{product.cost.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text textAlign="center" flex={1}>{product.price?.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text textAlign="center" flex={1}>{Number(product.cost).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text textAlign="center" flex={1}>{Number(product.price)?.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Text textAlign="center" flex={1} fontWeight="bold" color={
-                            product.profit >= product.minimum
-                            ? product.profit >= product.desired
+                            Number(product.profit) >= Number(product.minimum)
+                            ? Number(product.profit) >= Number(product.desired)
                             ? 'green.500'
                             : 'yellow.500'
                             : 'red.500'
-                        }>{product.profit}%</Text>
+                        }>{Number(product.profit).toLocaleString('pt-br', {maximumFractionDigits: 1, minimumFractionDigits: 1})}%</Text>
                         <Flex w="68px">
                             <IconButton
                                 size="sm"
