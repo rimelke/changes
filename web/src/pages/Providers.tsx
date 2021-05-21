@@ -5,7 +5,7 @@ import withSidebar from "../hooks/withSidebar"
 import { Form } from '@unform/web'
 import { Input, MaskInput } from "../components/Form"
 import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useGet } from "../hooks/useGet"
 import api from "../services/api"
 

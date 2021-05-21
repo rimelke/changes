@@ -1,21 +1,22 @@
 import { Flex, Heading, Stack, Text, IconButton, Button,
     AlertDialog, AlertDialogOverlay, AlertDialogContent,
-    AlertDialogHeader, 
+    AlertDialogHeader, Input,
     AlertDialogBody, Box,
-    AlertDialogFooter} from "@chakra-ui/react"
+    AlertDialogFooter,
+    Select} from "@chakra-ui/react"
 import withSidebar from "../hooks/withSidebar"
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
 import { useGet } from "../hooks/useGet"
 import { Link, useHistory } from "react-router-dom"
 import api from "../services/api"
 import { useRef, useState } from "react"
-import { mutate } from "swr"
 
 interface Product {
     id: number
     ref: string
     name: string
     group_name: string
+    group_id: number
     minimum: number
     desired: number
     cost: number
@@ -23,14 +24,22 @@ interface Product {
     profit: number
 }
 
+interface Group {
+    id: number
+    name: string
+}
+
 
 const Products = () => {
     const { data: products, mutate } = useGet<Product[]>('/products')
+    const { data: groups } = useGet<Group[]>('/groups')
     const history = useHistory()
 
     const cancelRef = useRef(null)
 
     const [isOpen, setIsOpen] = useState(false)
+    const [groupFilter, setGroupFilter] = useState<Number | null>(null)
+    const [search, setSearch] = useState('')
     const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
 
     function onClose() {
@@ -64,6 +73,17 @@ const Products = () => {
                 <Button colorScheme="teal" to="/new/product" as={Link}>
                     Novo
                 </Button>
+            </Flex>
+            <Flex mt={4}>
+                <Select
+                    flex={1}
+                    onChange={e => setGroupFilter(e.target.value === '' ? null : Number(e.target.value))}
+                    placeholder="Filtre por coleção">
+                    {groups?.map(group => (
+                        <option value={group.id} key={group.id}>{group.name}</option>
+                    ))}
+                </Select>
+                <Input placeholder="Digite para pesquisar" flex={3} ml={4} onChange={e => setSearch(e.target.value.toLowerCase())} />
             </Flex>
             <AlertDialog leastDestructiveRef={cancelRef} onClose={onClose} isOpen={isOpen}>
                 <AlertDialogOverlay>
@@ -104,7 +124,9 @@ const Products = () => {
                     <Text fontWeight="bold" textAlign="center" flex={1}>Lucro</Text>
                     <Box w="68px" />
                 </Flex>
-                {products?.map(product => (
+                {products?.filter(product => groupFilter === null ? true : Number(product.group_id) === groupFilter)
+                    .filter(product => product.name.toLowerCase().includes(search) || product.ref.toLowerCase().includes(search))
+                    .map(product => (
                     <Flex
                         key={product.id}
                         alignItems="center"
