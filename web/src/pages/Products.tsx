@@ -138,7 +138,7 @@ const Products = () => {
                         <Text flex={1}>{product.ref}</Text>
                         <Text flex={3}>{product.name}</Text>
                         <Text textAlign="center" flex={1}>{product.cost.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
-                        <Text textAlign="center" flex={1}>{product.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
+                        <Text textAlign="center" flex={1}>{product.price?.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</Text>
                         <Text textAlign="center" flex={1} fontWeight="bold" color={
                             product.profit >= product.minimum
                             ? product.profit >= product.desired
