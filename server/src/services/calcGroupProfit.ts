@@ -12,7 +12,7 @@ export default async function calcGroupProfit(group_id: number, trx: Transaction
     }
 
     if (sumCosts !== 0)
-        profit = Number((sumDifs * 100 / sumCosts).toFixed(0))
+        profit = Number((sumDifs * 100 / sumCosts).toFixed(1))
 
     await trx('groups').update({profit}).where('id', group_id)
 }
