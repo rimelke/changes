@@ -1,8 +1,13 @@
-import { Request, Response } from 'express'
+import { ErrorRequestHandler } from 'express'
+import { ValidationError } from 'joi'
 
-function errorMiddleware(e: Error, req: Request, res: Response) {
+const errorMiddleware: ErrorRequestHandler = (e, req, res) => {
+  if (e instanceof ValidationError) {
+    return res.status(400).json({ message: e.message || 'Validation error.' })
+  }
+
   console.error(e)
-  res.status(400).json({ message: e.message || 'Unexpected error.' })
+  return res.status(400).json({ message: e.message || 'Unexpected error.' })
 }
 
 export default errorMiddleware

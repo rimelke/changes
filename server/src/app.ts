@@ -5,7 +5,7 @@ import routes from './routes'
 import cors from 'cors'
 import morgan from 'morgan'
 
-import errorMiddleware from './middlewares/ErrorMiddleware'
+import errorMiddleware from './middlewares/errorMiddleware'
 
 const app = express()
 
