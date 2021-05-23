@@ -1,5 +1,5 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import 'reflect-metadata'
+import './database'
 import express from 'express'
 import routes from './routes'
 import { errors } from 'celebrate'
