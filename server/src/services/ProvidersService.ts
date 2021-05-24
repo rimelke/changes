@@ -1,13 +1,18 @@
 import Joi from 'joi'
 import { getCustomRepository, Repository } from 'typeorm'
+import Fabric from '../entities/Fabric'
 import Provider from '../entities/Provider'
+import AppError from '../errors/AppError'
+import FabricsRepository from '../repositories/FabricsRepository'
 import ProvidersRepository from '../repositories/ProvidersRepository'
 
 class ProvidersService {
   private providersRepository: Repository<Provider>
+  private fabricsRepository: Repository<Fabric>
 
   constructor() {
     this.providersRepository = getCustomRepository(ProvidersRepository)
+    this.fabricsRepository = getCustomRepository(FabricsRepository)
   }
 
   async getProviders() {
@@ -41,6 +46,12 @@ class ProvidersService {
   }
 
   async deleteProvider(id: string) {
+    const hasFabrics = await this.fabricsRepository.findOne({ providerId: id })
+
+    if (hasFabrics) {
+      throw new AppError('The are fabrics related to this provider.')
+    }
+
     return this.providersRepository.delete({ id })
   }
 }
