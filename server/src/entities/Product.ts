@@ -21,7 +21,7 @@ class Product {
   ref: string
 
   @JoinColumn({ name: 'groupId' })
-  @ManyToOne(() => Group)
+  @ManyToOne(() => Group, { onDelete: 'RESTRICT' })
   group: Group
 
   @Column()

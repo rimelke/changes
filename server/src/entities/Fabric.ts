@@ -19,7 +19,7 @@ class Fabric {
   providerId: string
 
   @JoinColumn({ name: 'providerId' })
-  @ManyToOne(() => Provider)
+  @ManyToOne(() => Provider, { onDelete: 'RESTRICT' })
   provider: Provider
 
   @Column()

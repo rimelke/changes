@@ -20,14 +20,14 @@ class ProductFabrics {
   productId: string
 
   @JoinColumn({ name: 'productId' })
-  @ManyToOne(() => Product)
+  @ManyToOne(() => Product, { onDelete: 'CASCADE' })
   product: Product
 
   @Column()
   fabricId: string
 
   @JoinColumn({ name: 'fabricId' })
-  @ManyToOne(() => Fabric)
+  @ManyToOne(() => Fabric, { onDelete: 'RESTRICT' })
   fabric: Fabric
 
   @Column({ type: 'decimal', precision: 5, scale: 3 })

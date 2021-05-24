@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import GroupsService from '../services/GroupsService'
 
 class GroupsController {
-  async index(req: Request, res: Response, enx) {
+  async index(req: Request, res: Response) {
     const groupsService = new GroupsService()
 
     const groups = await groupsService.getGroups()
