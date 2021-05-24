@@ -6,11 +6,11 @@ class Group {
   @PrimaryColumn()
   readonly id: string
 
-  @Column({ unique: true })
+  @Column()
   name: string
 
   @Column({ type: 'decimal', nullable: true })
-  profit: number
+  profit?: number
 
   @Column({ type: 'decimal' })
   desired: number
