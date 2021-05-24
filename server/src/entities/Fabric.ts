@@ -28,13 +28,13 @@ class Fabric {
   @Column()
   grammage: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   width: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   price: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   finalPrice: number
 
   @CreateDateColumn()

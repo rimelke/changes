@@ -9,13 +9,13 @@ class Group {
   @Column()
   name: string
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'real', nullable: true })
   profit?: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   desired: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   minimum: number
 
   constructor(props: Omit<Group, 'id'>) {

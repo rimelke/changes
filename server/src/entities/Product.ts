@@ -30,13 +30,13 @@ class Product {
   @Column()
   name: string
 
-  @Column({ nullable: true, type: 'decimal' })
+  @Column({ nullable: true, type: 'real' })
   cost?: number
 
-  @Column({ nullable: true, type: 'decimal' })
+  @Column({ nullable: true, type: 'real' })
   price?: number
 
-  @Column({ nullable: true, type: 'decimal' })
+  @Column({ nullable: true, type: 'real' })
   profit?: number
 
   @CreateDateColumn()

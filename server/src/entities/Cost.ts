@@ -25,7 +25,7 @@ class Cost {
   @Column()
   name: string
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   value: number
 
   @CreateDateColumn()

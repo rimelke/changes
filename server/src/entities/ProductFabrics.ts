@@ -30,13 +30,13 @@ class ProductFabrics {
   @ManyToOne(() => Fabric, { onDelete: 'RESTRICT' })
   fabric: Fabric
 
-  @Column({ type: 'decimal', precision: 5, scale: 3 })
+  @Column({ type: 'real' })
   efficiency: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   finalPrice: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   subtotal: number
 
   @CreateDateColumn()

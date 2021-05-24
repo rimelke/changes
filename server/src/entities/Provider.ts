@@ -15,7 +15,7 @@ class Provider {
   @Column()
   name: string
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'real' })
   tax: number
 
   @CreateDateColumn()
