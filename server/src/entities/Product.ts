@@ -11,6 +11,7 @@ import {
 import genId from '../utils/genId'
 import Cost from './Cost'
 import Group from './Group'
+import ProductFabrics from './ProductFabrics'
 
 @Entity('products')
 class Product {
@@ -45,8 +46,15 @@ class Product {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @OneToMany(() => Cost, (cost) => cost.product)
+  @OneToMany(() => Cost, (cost) => cost.product, {
+    cascade: true
+  })
   costs: Cost[]
+
+  @OneToMany(() => ProductFabrics, (productFabric) => productFabric.product, {
+    cascade: true
+  })
+  fabrics: ProductFabrics[]
 
   constructor(props: Omit<Group, 'id' | 'createdAt' | 'updatedAt'>) {
     Object.assign(this, props)

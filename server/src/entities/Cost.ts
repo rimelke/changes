@@ -19,7 +19,10 @@ class Cost {
   productId: string
 
   @JoinColumn({ name: 'productId' })
-  @ManyToOne(() => Product, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Product, {
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   product: Product
 
   @Column()
