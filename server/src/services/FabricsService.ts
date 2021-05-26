@@ -1,17 +1,15 @@
 import Joi from 'joi'
-import { getCustomRepository, Repository } from 'typeorm'
+import { getCustomRepository } from 'typeorm'
 import Fabric from '../entities/Fabric'
-import ProductFabrics from '../entities/ProductFabrics'
-import Provider from '../entities/Provider'
 import AppError from '../errors/AppError'
 import FabricsRepository from '../repositories/FabricsRepository'
 import ProductFabricsRepository from '../repositories/ProductFabricsRepository'
 import ProvidersRepository from '../repositories/ProvidersRepository'
 
 class FabricsService {
-  private fabricsRepository: Repository<Fabric>
-  private providersRepository: Repository<Provider>
-  private productFabricsRepository: Repository<ProductFabrics>
+  private fabricsRepository: FabricsRepository
+  private providersRepository: ProvidersRepository
+  private productFabricsRepository: ProductFabricsRepository
 
   constructor() {
     this.fabricsRepository = getCustomRepository(FabricsRepository)
@@ -75,6 +73,8 @@ class FabricsService {
             Math.round(fabric.price * (100 + fabric.provider.tax)) / 100
         }
       )
+
+      this.fabricsRepository.cascadeUpdates(id)
     }
   }
 

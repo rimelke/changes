@@ -1,14 +1,13 @@
 import Joi from 'joi'
-import { getCustomRepository, Repository } from 'typeorm'
-import Fabric from '../entities/Fabric'
+import { getCustomRepository } from 'typeorm'
 import Provider from '../entities/Provider'
 import AppError from '../errors/AppError'
 import FabricsRepository from '../repositories/FabricsRepository'
 import ProvidersRepository from '../repositories/ProvidersRepository'
 
 class ProvidersService {
-  private providersRepository: Repository<Provider>
-  private fabricsRepository: Repository<Fabric>
+  private providersRepository: ProvidersRepository
+  private fabricsRepository: FabricsRepository
 
   constructor() {
     this.providersRepository = getCustomRepository(ProvidersRepository)
@@ -43,6 +42,10 @@ class ProvidersService {
     const value = await schema.validateAsync(data)
 
     await this.providersRepository.update({ id }, value)
+
+    if (value.tax) {
+      this.providersRepository.cascadeUpdates(id)
+    }
   }
 
   async deleteProvider(id: string) {

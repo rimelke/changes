@@ -1,16 +1,10 @@
 import Joi from 'joi'
-import { getCustomRepository, Repository } from 'typeorm'
+import { getCustomRepository } from 'typeorm'
 import Group from '../entities/Group'
 import GroupsRepository from '../repositories/GroupsRepository'
 
-interface ICreateGroupData {
-  name: string
-  desired: number
-  minimum: number
-}
-
 class GroupsService {
-  private groupsRepository: Repository<Group>
+  private groupsRepository: GroupsRepository
 
   constructor() {
     this.groupsRepository = getCustomRepository(GroupsRepository)

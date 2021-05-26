@@ -1,17 +1,14 @@
 import Joi from 'joi'
-import { getCustomRepository, Like, Repository } from 'typeorm'
-import Fabric from '../entities/Fabric'
-import Group from '../entities/Group'
-import Product from '../entities/Product'
+import { getCustomRepository } from 'typeorm'
 import AppError from '../errors/AppError'
 import FabricsRepository from '../repositories/FabricsRepository'
 import GroupsRepository from '../repositories/GroupsRepository'
 import ProductsRepository from '../repositories/ProductsRepository'
 
 class ProductsService {
-  private productsRepository: Repository<Product>
-  private groupsRepository: Repository<Group>
-  private fabricsRepository: Repository<Fabric>
+  private productsRepository: ProductsRepository
+  private groupsRepository: GroupsRepository
+  private fabricsRepository: FabricsRepository
 
   constructor() {
     this.productsRepository = getCustomRepository(ProductsRepository)
@@ -124,6 +121,8 @@ class ProductsService {
     })
 
     await this.productsRepository.save(product)
+
+    this.groupsRepository.updateProfit(value.groupId)
   }
 
   async updateProduct(id: string, data: any) {
@@ -214,6 +213,11 @@ class ProductsService {
     })
 
     await this.productsRepository.save(mergedProduct)
+
+    if (value.groupId) {
+      this.groupsRepository.updateProfit(savedProduct.groupId)
+      this.groupsRepository.updateProfit(value.groupId)
+    }
   }
 
   async deleteProduct(id: string) {
