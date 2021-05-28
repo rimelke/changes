@@ -21,43 +21,34 @@ import { useGet } from '../hooks/useGet'
 import { Link, useHistory } from 'react-router-dom'
 import api from '../services/api'
 import { useRef, useState } from 'react'
-
-interface Product {
-  id: number
-  ref: string
-  name: string
-  group_name: string
-  group_id: number
-  minimum: number
-  desired: number
-  cost: number
-  price: number
-  profit: number
-}
-
-interface Group {
-  id: number
-  name: string
-}
+import IProduct from '../types/IProduct'
+import IGroup from '../types/IGroup'
+import getProducts from '../hooks/getProducts'
 
 const Products = () => {
-  const { data: products, mutate } = useGet<Product[]>('/products')
-  const { data: groups } = useGet<Group[]>('/groups')
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+
+  const { data: products, mutate } = getProducts({
+    groupId: selectedGroupId,
+    search
+  })
+  const { data: groups } = useGet<IGroup[]>('/groups')
+
   const history = useHistory()
 
   const cancelRef = useRef(null)
 
   const [isOpen, setIsOpen] = useState(false)
-  const [groupFilter, setGroupFilter] = useState<Number | null>(null)
-  const [search, setSearch] = useState('')
-  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
+
+  const [deletingProduct, setDeletingProduct] = useState<IProduct | null>(null)
 
   function onClose() {
     setIsOpen(false)
     setDeletingProduct(null)
   }
 
-  function handleDelete(product: Product) {
+  function handleDelete(product: IProduct) {
     setDeletingProduct(product)
     setIsOpen(true)
   }
@@ -84,7 +75,7 @@ const Products = () => {
         Produtos
       </Heading>
       <Flex mt={4}>
-        <Button colorScheme="teal" to="/new/product" as={Link}>
+        <Button colorScheme="teal" to="/products/new" as={Link}>
           Novo
         </Button>
       </Flex>
@@ -92,9 +83,7 @@ const Products = () => {
         <Select
           flex={1}
           onChange={(e) =>
-            setGroupFilter(
-              e.target.value === '' ? null : Number(e.target.value)
-            )
+            setSelectedGroupId(e.target.value === '' ? null : e.target.value)
           }
           placeholder="Filtre por coleção">
           {groups?.map((group) => (
@@ -168,18 +157,8 @@ const Products = () => {
           </Text>
           <Box w="68px" />
         </Flex>
-        {products
-          ?.filter((product) =>
-            groupFilter === null
-              ? true
-              : Number(product.group_id) === groupFilter
-          )
-          .filter(
-            (product) =>
-              product.name.toLowerCase().includes(search) ||
-              product.ref.toLowerCase().includes(search)
-          )
-          .map((product) => (
+        {products &&
+          products.map((product) => (
             <Flex
               key={product.id}
               alignItems="center"
@@ -187,7 +166,7 @@ const Products = () => {
               p={3}
               _hover={{ bg: 'gray.50' }}
               borderWidth="1px">
-              <Text flex={2}>{product.group_name}</Text>
+              <Text flex={2}>{product.group.name}</Text>
               <Text flex={1}>{product.ref}</Text>
               <Text flex={3}>{product.name}</Text>
               <Text textAlign="center" flex={1}>
@@ -207,8 +186,8 @@ const Products = () => {
                 flex={1}
                 fontWeight="bold"
                 color={
-                  Number(product.profit) >= Number(product.minimum)
-                    ? Number(product.profit) >= Number(product.desired)
+                  Number(product.profit) >= Number(product.group.minimum)
+                    ? Number(product.profit) >= Number(product.group.desired)
                       ? 'green.500'
                       : 'yellow.500'
                     : 'red.500'

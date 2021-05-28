@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { getCustomRepository } from 'typeorm'
+import { getCustomRepository, Like } from 'typeorm'
 import AppError from '../errors/AppError'
 import FabricsRepository from '../repositories/FabricsRepository'
 import GroupsRepository from '../repositories/GroupsRepository'
@@ -19,29 +19,40 @@ class ProductsService {
   async getProducts(params: any = {}) {
     const schema = Joi.object().keys({
       take: Joi.number().positive().integer().max(100),
-      skip: Joi.number().positive().integer(),
-      groupId: Joi.string()
+      skip: Joi.number().integer().min(0),
+      groupId: Joi.string(),
+      search: Joi.string()
     })
 
     const value = await schema.validateAsync(params)
 
-    const [data, total] = await this.productsRepository.findAndCount({
-      ...value,
-      where: value.groupId ? { groupId: value.groupId } : {},
-      relations: ['group']
-    })
+    let whereClause = ''
+    if (value.groupId) whereClause += `groupId = "${value.groupId}"`
+    if (value.search) {
+      if (value.groupId) whereClause += ' AND '
+      whereClause += `(products.name LIKE "%${value.search}%" OR ref LIKE "%${value.search}%")`
+    }
 
-    console.log({
-      ...value,
-      relations: ['group']
-    })
+    const [data, total] = await this.productsRepository
+      .createQueryBuilder('products')
+      .innerJoinAndSelect('products.group', 'group')
+      .take(value.take)
+      .skip(value.skip)
+      .where(whereClause)
+      .getManyAndCount()
 
     return { total, data }
   }
 
   async getProductById(id: string) {
     return this.productsRepository.findOne(id, {
-      relations: ['group', 'costs', 'fabrics', 'fabrics.fabric', 'fabrics.fabric.provider']
+      relations: [
+        'group',
+        'costs',
+        'fabrics',
+        'fabrics.fabric',
+        'fabrics.fabric.provider'
+      ]
     })
   }
 
