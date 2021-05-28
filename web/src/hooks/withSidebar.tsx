@@ -1,7 +1,8 @@
 import { Divider, Flex } from '@chakra-ui/react'
+import { ComponentType } from 'react'
 import Sidebar from '../components/Sidebar'
 
-const withSidebar = (Component: React.ComponentType) => {
+const withSidebar = (Component: ComponentType) => {
   const Wrapper = () => {
     return (
       <Flex h="100vh">
