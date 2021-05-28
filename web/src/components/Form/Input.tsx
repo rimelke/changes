@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { FC, useEffect, useRef } from 'react'
 import { useField } from '@unform/core'
 import {
   Input as ChakraInput,
@@ -11,7 +11,7 @@ interface Props {
 
 type InputProps = Props & ChakraInputProps
 
-const Input: React.FC<InputProps> = ({ name, ...rest }) => {
+const Input: FC<InputProps> = ({ name, ...rest }) => {
   const inputRef = useRef(null)
   const { fieldName, defaultValue, registerField } = useField(name)
 
