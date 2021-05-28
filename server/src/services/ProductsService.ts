@@ -41,7 +41,7 @@ class ProductsService {
 
   async getProductById(id: string) {
     return this.productsRepository.findOne(id, {
-      relations: ['group', 'costs', 'fabrics', 'fabrics.fabric']
+      relations: ['group', 'costs', 'fabrics', 'fabrics.fabric', 'fabrics.fabric.provider']
     })
   }
 

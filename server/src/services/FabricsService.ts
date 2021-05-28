@@ -20,7 +20,7 @@ class FabricsService {
   }
 
   async getFabrics() {
-    return this.fabricsRepository.find()
+    return this.fabricsRepository.find({ relations: ['provider'] })
   }
 
   async createFabric(data: any) {
