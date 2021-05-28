@@ -107,7 +107,9 @@ const Groups = () => {
           autoComplete="off"
           name="minimum"
           placeholder="Lucro mínimo"
-          decimalScale={0}
+          decimalScale={1}
+          decimalSeparator=","
+          fixedDecimalScale
           suffix=" %"
         />
         <MaskInput
@@ -117,7 +119,9 @@ const Groups = () => {
           autoComplete="off"
           name="desired"
           placeholder="Lucro desejado"
-          decimalScale={0}
+          decimalScale={1}
+          decimalSeparator=","
+          fixedDecimalScale
           suffix=" %"
         />
         <Button
