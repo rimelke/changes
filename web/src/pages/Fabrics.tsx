@@ -28,8 +28,10 @@ interface Provider {
 interface Fabric {
   id: number
   name: string
-  provider_id: number
-  provider_name: string
+  providerId: number
+  provider: {
+    name: string
+  }
   price: number
   width: number
   grammage: number
@@ -102,7 +104,7 @@ const Fabrics = () => {
         <Flex>
           <Select
             isRequired
-            name="provider_id"
+            name="providerId"
             w={56}
             placeholder="Selecione o fornecedor">
             {providers?.map((provider) => (
@@ -218,7 +220,7 @@ const Fabrics = () => {
                 price: Number(fabric.price)
               }}
               as={Form}>
-              <Select isRequired name="provider_id" w={32} h={8}>
+              <Select isRequired name="providerId" w={32} h={8}>
                 {providers?.map((provider) => (
                   <option key={provider.id} value={provider.id}>
                     {provider.name}
@@ -288,7 +290,7 @@ const Fabrics = () => {
               _hover={{ bg: 'gray.50' }}
               p={3}
               borderWidth="1px">
-              <Text flex={3}>{fabric.provider_name}</Text>
+              <Text flex={3}>{fabric.provider.name}</Text>
               <Text flex={5}>{fabric.name}</Text>
               <Text textAlign="center" flex={2}>
                 {fabric.grammage} g/m²
