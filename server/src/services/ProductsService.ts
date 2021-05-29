@@ -21,7 +21,7 @@ class ProductsService {
       take: Joi.number().positive().integer().max(100),
       skip: Joi.number().integer().min(0),
       groupId: Joi.string(),
-      search: Joi.string()
+      search: Joi.string().lowercase()
     })
 
     const value = await schema.validateAsync(params)
@@ -30,7 +30,7 @@ class ProductsService {
     if (value.groupId) whereClause += `groupId = '${value.groupId}'`
     if (value.search) {
       if (value.groupId) whereClause += ' AND '
-      whereClause += `(products.name LIKE '%${value.search}%' OR ref LIKE '%${value.search}%')`
+      whereClause += `(LOWER(products.name) LIKE '%${value.search}%' OR LOWER(ref) LIKE '%${value.search}%')`
     }
 
     const [data, total] = await this.productsRepository
