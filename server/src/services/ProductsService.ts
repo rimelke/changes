@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { getCustomRepository, Like } from 'typeorm'
+import { getCustomRepository } from 'typeorm'
 import AppError from '../errors/AppError'
 import FabricsRepository from '../repositories/FabricsRepository'
 import GroupsRepository from '../repositories/GroupsRepository'
@@ -27,10 +27,10 @@ class ProductsService {
     const value = await schema.validateAsync(params)
 
     let whereClause = ''
-    if (value.groupId) whereClause += `groupId = "${value.groupId}"`
+    if (value.groupId) whereClause += `groupId = '${value.groupId}'`
     if (value.search) {
       if (value.groupId) whereClause += ' AND '
-      whereClause += `(products.name LIKE "%${value.search}%" OR ref LIKE "%${value.search}%")`
+      whereClause += `(products.name LIKE '%${value.search}%' OR ref LIKE '%${value.search}%')`
     }
 
     const [data, total] = await this.productsRepository
