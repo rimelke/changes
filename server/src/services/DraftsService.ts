@@ -1,0 +1,61 @@
+import Joi from 'joi'
+import { getCustomRepository } from 'typeorm'
+import AppError from '../errors/AppError'
+import DraftsRepository from '../repositories/DraftsRepository'
+
+interface ICreateDraftData {
+  name: string
+  groupId: string
+}
+
+class DraftsService {
+  private draftsRepository: DraftsRepository
+
+  constructor() {
+    this.draftsRepository = getCustomRepository(DraftsRepository)
+  }
+
+  async getDrafts() {
+    const drafts = await this.draftsRepository.find()
+
+    return drafts
+  }
+
+  async createDraft(data: ICreateDraftData) {
+    const schema = Joi.object<ICreateDraftData>().keys({
+      groupId: Joi.string().required(),
+      name: Joi.string().required()
+    })
+
+    const value: ICreateDraftData = await schema.validateAsync(data)
+
+    const nameIsUsed = await this.draftsRepository.findOne({
+      where: { name: value.name }
+    })
+
+    if (nameIsUsed) throw new AppError('Name already used.')
+
+    const draft = this.draftsRepository.create(value)
+
+    await this.draftsRepository.save(draft)
+  }
+
+  async updateDraft(id: string, data: unknown) {
+    const schema = Joi.object()
+      .keys({
+        groupId: Joi.string(),
+        name: Joi.string()
+      })
+      .min(1)
+
+    const value = await schema.validateAsync(data)
+
+    await this.draftsRepository.update({ id }, value)
+  }
+
+  async deleteDraft(id: string) {
+    return this.draftsRepository.delete({ id })
+  }
+}
+
+export default DraftsService

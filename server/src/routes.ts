@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import DraftsController from './controllers/DraftsController'
 import FabricsController from './controllers/FabricsController'
 import GroupsController from './controllers/GroupsController'
 import ProductsController from './controllers/ProductsController'
@@ -8,6 +9,7 @@ const groupsController = new GroupsController()
 const providersController = new ProvidersController()
 const fabricsController = new FabricsController()
 const productsController = new ProductsController()
+const draftsController = new DraftsController()
 
 const routes = Router()
 
@@ -31,5 +33,10 @@ routes.get('/products/:id', productsController.show)
 routes.post('/products', productsController.create)
 routes.put('/products/:id', productsController.update)
 routes.delete('/products/:id', productsController.delete)
+
+routes.get('/drafts', draftsController.index)
+routes.post('/drafts', draftsController.create)
+routes.put('/drafts/:id', draftsController.update)
+routes.delete('/drafts/:id', draftsController.delete)
 
 export default routes
