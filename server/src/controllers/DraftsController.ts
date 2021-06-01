@@ -10,6 +10,16 @@ class DraftsController {
     res.json(drafts)
   }
 
+  async show(req: Request, res: Response) {
+    const { id } = req.params
+
+    const draftsService = new DraftsService()
+
+    const draft = await draftsService.getDraft(id)
+
+    res.json(draft)
+  }
+
   async create(req: Request, res: Response) {
     const draftsService = new DraftsService()
 

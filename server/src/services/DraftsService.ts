@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { getCustomRepository } from 'typeorm'
 import AppError from '../errors/AppError'
 import DraftsRepository from '../repositories/DraftsRepository'
+import GroupsRepository from '../repositories/GroupsRepository'
 
 interface ICreateDraftData {
   name: string
@@ -10,15 +11,31 @@ interface ICreateDraftData {
 
 class DraftsService {
   private draftsRepository: DraftsRepository
+  private groupsRepository: GroupsRepository
 
   constructor() {
     this.draftsRepository = getCustomRepository(DraftsRepository)
+    this.groupsRepository = getCustomRepository(GroupsRepository)
   }
 
   async getDrafts() {
     const drafts = await this.draftsRepository.find()
 
     return drafts
+  }
+
+  async getDraft(id: string) {
+    return this.draftsRepository
+      .createQueryBuilder('drafts')
+      .where('drafts.id = :id', { id })
+      .innerJoinAndMapMany(
+        'drafts.changes',
+        'changes',
+        'changes',
+        'changes.referenceId = drafts.id'
+      )
+      .addOrderBy('changes.createdAt', 'DESC')
+      .getOne()
   }
 
   async createDraft(data: ICreateDraftData) {
@@ -28,6 +45,10 @@ class DraftsService {
     })
 
     const value: ICreateDraftData = await schema.validateAsync(data)
+
+    const groupIsValid = await this.groupsRepository.findOne(value.groupId)
+
+    if (!groupIsValid) throw new AppError('Invalid groupId')
 
     const nameIsUsed = await this.draftsRepository.findOne({
       where: { name: value.name }
