@@ -5,7 +5,7 @@ export class CreateChanges1622485305996 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      'CREATE TABLE "changes" ("id" varchar PRIMARY KEY NOT NULL, "referenceId" varchar NOT NULL, "description" text, "filename" varchar NOT NULL, "url" varchar NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime(\'now\')), "updatedAt" datetime NOT NULL DEFAULT (datetime(\'now\')))'
+      'CREATE TABLE "changes" ("id" varchar PRIMARY KEY NOT NULL, "referenceId" varchar NOT NULL, "description" text, "filename" varchar NOT NULL, "url" varchar NOT NULL, "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP)'
     )
   }
 
