@@ -21,15 +21,18 @@ import { useGet } from '../hooks/useGet'
 import withSidebar from '../hooks/withSidebar'
 import IDetailedDraft from '../types/IDetailedDraft'
 import IDraft from '../types/IDraft'
-import { FiDownload, FiPlus } from 'react-icons/fi'
+import { FiDownload, FiPlus, FiEdit2 } from 'react-icons/fi'
 import { Button, IconButton } from '@chakra-ui/button'
-import { Dropzone, Textarea } from '../components/Form'
+import { Dropzone, Input, Select, Textarea } from '../components/Form'
 import { Form } from '@unform/web'
 import api from '../services/api'
 import { FormHandles } from '@unform/core'
+import IGroup from '../types/IGroup'
+import { useToast } from '@chakra-ui/toast'
 
 const Drafts = () => {
-  const { data: drafts } = useGet<IDraft[]>('/drafts')
+  const { data: drafts, mutate: draftsMutate } = useGet<IDraft[]>('/drafts')
+  const { data: groups } = useGet<IGroup[]>('/groups')
 
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null)
   const { data: selectedDraft, mutate } = useGet<IDetailedDraft>(
@@ -43,6 +46,13 @@ const Drafts = () => {
   } = useDisclosure()
   const [newChangeLoading, setNewChangeLoading] = useState(false)
   const newChangeFormRef = useRef<FormHandles>(null)
+  const {
+    isOpen: editDraftIsOpen,
+    onClose: editDraftOnClose,
+    onOpen: editDraftOnOpen
+  } = useDisclosure()
+  const [editDraftLoading, setEditDraftLoading] = useState(false)
+  const toast = useToast()
 
   function handleSubmitNewChange(data: {
     description: string
@@ -69,7 +79,40 @@ const Drafts = () => {
           mutate()
           newChangeOnClose()
         })
+        .catch(() =>
+          toast({
+            title: 'Um erro inesperado ocorreu!',
+            description: 'Recarregue a página e tente novamente',
+            status: 'error',
+            position: 'bottom-left',
+            isClosable: true
+          })
+        )
         .finally(() => setNewChangeLoading(false))
+    }
+  }
+
+  function handleSubmitEditDraft(data: { name: string; groupId: string }) {
+    console.log(data)
+    if (selectedDraftId) {
+      setEditDraftLoading(true)
+      api
+        .put(`/drafts/${selectedDraftId}`, data)
+        .then(() => {
+          mutate()
+          draftsMutate()
+          editDraftOnClose()
+        })
+        .catch(() =>
+          toast({
+            title: 'Um erro inesperado ocorreu!',
+            description: 'Recarregue a página e tente novamente',
+            status: 'error',
+            position: 'bottom-left',
+            isClosable: true
+          })
+        )
+        .finally(() => setEditDraftLoading(false))
     }
   }
 
@@ -80,6 +123,43 @@ const Drafts = () => {
       </Heading>
       {selectedDraft && (
         <>
+          <Modal isOpen={editDraftIsOpen} onClose={editDraftOnClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Editar rascunho - {selectedDraft.name}</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody mb={2}>
+                <Form
+                  initialData={selectedDraft}
+                  onSubmit={handleSubmitEditDraft}>
+                  <Input isRequired name="name" placeholder="Digite o nome" />
+                  <Select isRequired mt={4} name="groupId">
+                    {groups?.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <Flex mt={6} justifyContent="flex-end">
+                    <Button
+                      onClick={editDraftOnClose}
+                      colorScheme="red"
+                      variant="ghost">
+                      Cancelar
+                    </Button>
+                    <Button
+                      ml={2}
+                      isLoading={editDraftLoading}
+                      colorScheme="green"
+                      type="submit">
+                      Salvar
+                    </Button>
+                  </Flex>
+                </Form>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+
           <Modal isOpen={newChangeIsOpen} onClose={newChangeOnClose}>
             <ModalOverlay />
             <ModalContent>
@@ -119,15 +199,25 @@ const Drafts = () => {
                   </Text>
                 </Flex>
                 <Flex mt={6} alignItems="center" justifyContent="space-between">
-                  <Heading size="md">Mudanças</Heading>
-                  <IconButton
-                    size="xs"
-                    variant="outline"
-                    colorScheme="teal"
-                    onClick={newChangeOnOpen}
-                    aria-label="Adicionar modificação"
-                    icon={<FiPlus size={22} />}
-                  />
+                  <Heading size="md">Modificações</Heading>
+                  <Stack direction="row">
+                    <IconButton
+                      size="xs"
+                      variant="outline"
+                      colorScheme="teal"
+                      onClick={newChangeOnOpen}
+                      aria-label="Adicionar modificação"
+                      icon={<FiPlus size={22} />}
+                    />
+                    <IconButton
+                      size="xs"
+                      variant="outline"
+                      colorScheme="orange"
+                      onClick={editDraftOnOpen}
+                      aria-label="Editar rascunho"
+                      icon={<FiEdit2 size={18} />}
+                    />
+                  </Stack>
                 </Flex>
                 <Stack mt={4} divider={<StackDivider />}>
                   {selectedDraft.changes.map((change) => (
