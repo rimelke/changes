@@ -20,5 +20,17 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           local: server/build
-          remote: fone
+          remote: app/fabricosts/server/build
           rmRemote: true
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd app
+            cd fabricosts
+            cd server
+            pm2 stop fabricosts_server
+            npm run migrate
+            pm2 start fabricosts_server
