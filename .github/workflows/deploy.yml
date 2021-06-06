@@ -9,18 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: appleboy/ssh-action@master
+      - run: cd server
+      - uses: borales/actions-yarn@v2.0.0
         with:
+          cmd: install
+      - uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: build
+      - uses: garygrossgarten/github-action-scp@release
+        with:
+          privateKey: ${{ secrets.KEY }}
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
-          key: ${{ secrets.KEY }}
-          script: |
-            cd app
-            cd fabricosts
-            cd server
-            pm2 stop fabricosts_server
-            git pull
-            npm install
-            npm run build
-            npm run migrate
-            pm2 start fabricosts_server
+          local: build
+          remote: fon
+          rmRemote: true
