@@ -3,9 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn
 } from 'typeorm'
 import genId from '../utils/genId'
+import Group from './Group'
 
 @Entity('drafts')
 class Draft {
@@ -14,6 +17,10 @@ class Draft {
 
   @Column()
   groupId: string
+
+  @JoinColumn({ name: 'groupId' })
+  @ManyToOne(() => Group)
+  group: Group
 
   @Column({ unique: true })
   name: string

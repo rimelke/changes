@@ -19,7 +19,10 @@ class DraftsService {
   }
 
   async getDrafts() {
-    const drafts = await this.draftsRepository.find()
+    const drafts = await this.draftsRepository.find({
+      relations: ['group'],
+      order: { updatedAt: 'DESC' }
+    })
 
     return drafts
   }
@@ -28,7 +31,8 @@ class DraftsService {
     return this.draftsRepository
       .createQueryBuilder('drafts')
       .where('drafts.id = :id', { id })
-      .innerJoinAndMapMany(
+      .innerJoinAndSelect('drafts.group', 'group')
+      .leftJoinAndMapMany(
         'drafts.changes',
         'changes',
         'changes',
