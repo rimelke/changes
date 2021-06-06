@@ -9,13 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - run: ls
       - run: cd server
+      - run: ls
       - uses: borales/actions-yarn@v2.0.0
         with:
           cmd: install
+      - run: ls
       - uses: borales/actions-yarn@v2.0.0
         with:
           cmd: build
+      - run: ls
       - uses: garygrossgarten/github-action-scp@release
         with:
           privateKey: ${{ secrets.KEY }}
