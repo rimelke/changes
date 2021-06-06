@@ -20,5 +20,5 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           local: server/build
-          remote: fon
+          remote: fone
           rmRemote: true
