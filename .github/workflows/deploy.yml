@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: ls
-      - run: cd server
+      - run: cd server && ls
       - run: ls
       - uses: borales/actions-yarn@v2.0.0
         with:
