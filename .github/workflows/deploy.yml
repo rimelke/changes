@@ -18,4 +18,7 @@ jobs:
             cd app
             cd fabricosts
             cd server
-            ls
+            git pull
+            npm install
+            npm run build
+            pm2 restart fabricosts_server
