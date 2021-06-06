@@ -14,7 +14,8 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.KEY }}
-          script: cd app
+          script: |
+            cd app
             cd fabricosts
             cd server
             ls
