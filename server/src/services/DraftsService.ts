@@ -19,12 +19,11 @@ class DraftsService {
   }
 
   async getDrafts() {
-    const drafts = await this.draftsRepository.find({
-      relations: ['group'],
-      order: { updatedAt: 'DESC' }
-    })
-
-    return drafts
+    return this.draftsRepository
+      .createQueryBuilder('drafts')
+      .innerJoinAndSelect('drafts.group', 'group')
+      .orderBy('drafts.updatedAt', 'DESC')
+      .getMany()
   }
 
   async getDraft(id: string) {

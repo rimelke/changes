@@ -53,6 +53,12 @@ const Drafts = () => {
   } = useDisclosure()
   const [editDraftLoading, setEditDraftLoading] = useState(false)
   const toast = useToast()
+  const {
+    isOpen: newDraftIsOpen,
+    onClose: newDraftOnClose,
+    onOpen: newDraftOnOpen
+  } = useDisclosure()
+  const [newDraftLoading, setNewDraftLoading] = useState(false)
 
   function handleSubmitNewChange(data: {
     description: string
@@ -93,7 +99,6 @@ const Drafts = () => {
   }
 
   function handleSubmitEditDraft(data: { name: string; groupId: string }) {
-    console.log(data)
     if (selectedDraftId) {
       setEditDraftLoading(true)
       api
@@ -116,11 +121,64 @@ const Drafts = () => {
     }
   }
 
+  function handleSubmitNewDraft(data: { name: string; groupId: string }) {
+    setNewDraftLoading(true)
+    api
+      .post('/drafts', data)
+      .then(() => {
+        draftsMutate()
+        newDraftOnClose()
+      })
+      .catch(() =>
+        toast({
+          title: 'Um erro inesperado ocorreu!',
+          description: 'Recarregue a página e tente novamente',
+          status: 'error',
+          position: 'bottom-left',
+          isClosable: true
+        })
+      )
+      .finally(() => setNewDraftLoading(false))
+  }
+
   return (
     <Flex as="main" flexDir="column" flex={1} mt={4} mr={8}>
       <Heading size="lg" color="teal.500">
         Rascunhos
       </Heading>
+      <Flex mt={4}>
+        <Button colorScheme="teal" onClick={newDraftOnOpen}>
+          Novo
+        </Button>
+      </Flex>
+      <Modal isOpen={newDraftIsOpen} onClose={newDraftOnClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Novo rascunho</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody mb={2}>
+            <Form onSubmit={handleSubmitNewDraft}>
+              <Input isRequired name="name" placeholder="Digite o nome" />
+              <Select isRequired mt={4} name="groupId">
+                {groups?.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </Select>
+              <Flex mt={6} justifyContent="flex-end">
+                <Button
+                  isLoading={newDraftLoading}
+                  ml={2}
+                  colorScheme="green"
+                  type="submit">
+                  Criar
+                </Button>
+              </Flex>
+            </Form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       {selectedDraft && (
         <>
           <Modal isOpen={editDraftIsOpen} onClose={editDraftOnClose}>
