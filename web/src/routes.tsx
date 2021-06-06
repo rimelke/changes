@@ -8,6 +8,7 @@ import Products from './pages/Products'
 import NewProduct from './pages/NewProduct'
 import Groups from './pages/Groups'
 import EditProduct from './pages/EditProduct'
+import Drafts from './pages/Drafts'
 
 const Routes: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const Routes: React.FC = () => {
         <Route path="/products/new" exact component={NewProduct} />
         <Route path="/products/:id" exact component={EditProduct} />
         <Route path="/groups" exact component={Groups} />
+        <Route path="/drafts" exact component={Drafts} />
       </Switch>
     </BrowserRouter>
   )

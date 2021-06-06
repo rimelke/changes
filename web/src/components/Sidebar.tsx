@@ -1,6 +1,13 @@
 import { Flex, Heading, List, ListIcon } from '@chakra-ui/react'
 import { Link, useLocation } from 'react-router-dom'
-import { FiHome, FiPackage, FiDisc, FiTruck, FiBriefcase } from 'react-icons/fi'
+import {
+  FiHome,
+  FiPackage,
+  FiDisc,
+  FiTruck,
+  FiBriefcase,
+  FiPenTool
+} from 'react-icons/fi'
 
 const items = [
   {
@@ -12,7 +19,8 @@ const items = [
   { name: 'Coleções', icon: FiBriefcase, path: '/groups' },
   { name: 'Produtos', icon: FiPackage, path: '/products' },
   { name: 'Tecidos', icon: FiDisc, path: '/fabrics' },
-  { name: 'Fornecedores', icon: FiTruck, path: '/providers' }
+  { name: 'Fornecedores', icon: FiTruck, path: '/providers' },
+  { name: 'Rascunhos', icon: FiPenTool, path: '/drafts' }
 ]
 
 const Sidebar = () => {
