@@ -9,22 +9,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: ls
-      - run: cd server && ls
-      - run: ls
       - uses: borales/actions-yarn@v2.0.0
+        working-directory: server
         with:
           cmd: install
-      - run: ls
       - uses: borales/actions-yarn@v2.0.0
+        working-directory: server
         with:
           cmd: build
-      - run: ls
       - uses: garygrossgarten/github-action-scp@release
         with:
           privateKey: ${{ secrets.KEY }}
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
-          local: build
+          local: server/build
           remote: fon
           rmRemote: true
