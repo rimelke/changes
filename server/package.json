@@ -5,12 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/server.js",
-    "migrate": "knex --knexfile build/config/knexfile.js migrate:latest",
-    "seed": "knex --knexfile build/config/knexfile.js seed:run",
+    "migrate": "node ./node_modules/typeorm/cli.js migration:run",
     "build": "rimraf build && tsc",
     "dev": "ts-node-dev --ignore-watch node_modules src/server.ts",
-    "dev:seed": "knex --knexfile src/config/knexfile.ts seed:run",
-    "dev:migrate": "knex --knexfile src/config/knexfile.ts migrate:latest",
+    "dev:migrate": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "dev:typeorm": "ts-node ./node_modules/typeorm/cli.js"
   },
   "keywords": [],

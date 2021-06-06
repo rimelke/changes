@@ -18,7 +18,9 @@ jobs:
             cd app
             cd fabricosts
             cd server
+            pm2 stop fabricosts_server
             git pull
             npm install
             npm run build
-            pm2 restart fabricosts_server
+            npm run migrate
+            pm2 start fabricosts_server
