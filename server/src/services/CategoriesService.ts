@@ -30,6 +30,18 @@ class CategoriesService {
 
     await this.categoriesRepository.save(category)
   }
+
+  async updateCategory(id: string, data: { name: string }) {
+    const schema = Joi.object()
+      .keys({
+        name: Joi.string()
+      })
+      .min(1)
+
+    const value = await schema.validateAsync(data)
+
+    await this.categoriesRepository.update({ id }, value)
+  }
 }
 
 export default CategoriesService
