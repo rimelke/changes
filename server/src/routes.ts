@@ -49,5 +49,6 @@ routes.put('/changes/:id', changesController.update)
 routes.delete('/changes/:id', changesController.delete)
 
 routes.get('/categories', categoriesController.index)
+routes.post('/categories', categoriesController.create)
 
 export default routes

@@ -19,7 +19,7 @@ class ChangesService {
   async createChange(data: unknown) {
     const schema = Joi.object().keys({
       referenceId: Joi.string().required(),
-      referenceType: Joi.allow('product', 'draft').required(),
+      referenceType: Joi.valid('product', 'draft').required(),
       description: Joi.string(),
       filename: Joi.string().required(),
       url: Joi.string().uri().required()

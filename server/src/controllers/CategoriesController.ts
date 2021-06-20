@@ -9,6 +9,14 @@ class CategoriesController {
 
     res.json(categories)
   }
+
+  async create(req: Request, res: Response) {
+    const categoriesService = new CategoriesService()
+
+    await categoriesService.createCategory(req.body)
+
+    res.status(201).send()
+  }
 }
 
 export default CategoriesController
