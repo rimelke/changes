@@ -2,6 +2,7 @@ import { Router } from 'express'
 import ChangesController from './controllers/ChangesController'
 import DraftsController from './controllers/DraftsController'
 import FabricsController from './controllers/FabricsController'
+import CategoriesController from './controllers/FlowCategoriesController'
 import GroupsController from './controllers/GroupsController'
 import ProductsController from './controllers/ProductsController'
 import ProvidersController from './controllers/ProvidersController'
@@ -12,6 +13,7 @@ const fabricsController = new FabricsController()
 const productsController = new ProductsController()
 const draftsController = new DraftsController()
 const changesController = new ChangesController()
+const categoriesController = new CategoriesController()
 
 const routes = Router()
 
@@ -45,5 +47,7 @@ routes.delete('/drafts/:id', draftsController.delete)
 routes.post('/changes', changesController.create)
 routes.put('/changes/:id', changesController.update)
 routes.delete('/changes/:id', changesController.delete)
+
+routes.get('/categories', categoriesController.index)
 
 export default routes
