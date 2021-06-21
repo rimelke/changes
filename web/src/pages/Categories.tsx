@@ -11,7 +11,9 @@ import {
   ModalCloseButton,
   ModalBody,
   Button,
-  useToast
+  useToast,
+  IconButton,
+  Input as ChakraInput
 } from '@chakra-ui/react'
 import { Form } from '@unform/web'
 import { useState } from 'react'
@@ -20,6 +22,7 @@ import { useGet } from '../hooks/useGet'
 import withSidebar from '../hooks/withSidebar'
 import api from '../services/api'
 import ICategory from '../types/ICategory'
+import { FiEdit } from 'react-icons/fi'
 
 const Categories = () => {
   const { data: categories, mutate } = useGet<ICategory[]>('/categories')
@@ -31,6 +34,14 @@ const Categories = () => {
     onOpen: newCategoryOnOpen
   } = useDisclosure()
   const [newCategoryIsLoading, setNewCategoryIsLoading] = useState(false)
+
+  const [editCategory, setEditCategory] = useState<ICategory>()
+  const {
+    isOpen: editCategoryIsOpen,
+    onClose: editCategoryOnClose,
+    onOpen: editCategoryOnOpen
+  } = useDisclosure()
+  const [editCategoryIsLoading, setEditCategoryIsLoading] = useState(false)
 
   function handleNewCategorySubmit(data: {
     type: 'INCOME' | 'EXPENSE'
@@ -54,6 +65,29 @@ const Categories = () => {
         })
       )
       .finally(() => setNewCategoryIsLoading(false))
+  }
+
+  function handleEditCategorySubmit(data: { name: string }) {
+    if (editCategory) {
+      setEditCategoryIsLoading(true)
+
+      api
+        .put(`/categories/${editCategory.id}`, data)
+        .then(() => {
+          mutate()
+          editCategoryOnClose()
+        })
+        .catch(() =>
+          toast({
+            title: 'Um erro inesperado ocorreu!',
+            description: 'Recarregue a página e tente novamente',
+            status: 'error',
+            position: 'bottom-left',
+            isClosable: true
+          })
+        )
+        .finally(() => setEditCategoryIsLoading(false))
+    }
   }
 
   return (
@@ -93,6 +127,42 @@ const Categories = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+
+      {editCategory && (
+        <Modal isOpen={editCategoryIsOpen} onClose={editCategoryOnClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Editar categoria - {editCategory.name}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody mb={2}>
+              <Form
+                initialData={editCategory}
+                onSubmit={handleEditCategorySubmit}>
+                <ChakraInput
+                  isDisabled
+                  value={editCategory.type === 'INCOME' ? 'Entrada' : 'Saída'}
+                />
+                <Input placeholder="Digite o nome aqui" mt={4} name="name" />
+                <Flex justifyContent="flex-end" mt={6}>
+                  <Button
+                    onClick={editCategoryOnClose}
+                    mr={2}
+                    colorScheme="red"
+                    variant="ghost">
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    isLoading={editCategoryIsLoading}
+                    colorScheme="green">
+                    Salvar
+                  </Button>
+                </Flex>
+              </Form>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
 
       <Stack mt={4}>
         <Flex
@@ -143,6 +213,19 @@ const Categories = () => {
               {category.type === 'INCOME' ? 'Entrada' : 'Saída'}
             </Text>
             <Text flex={1}>{category.name}</Text>
+            <Stack direction="row">
+              <IconButton
+                size="sm"
+                borderRadius={7}
+                colorScheme="orange"
+                onClick={() => {
+                  setEditCategory(category)
+                  editCategoryOnOpen()
+                }}
+                aria-label="Editar categoria"
+                icon={<FiEdit />}
+              />
+            </Stack>
           </Flex>
         ))}
       </Stack>
