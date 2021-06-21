@@ -50,6 +50,7 @@ class BudgetsService {
     }: IGetBudgetsParams = await schema.validateAsync(params)
 
     return this.budgetsRepository.find({
+      relations: ['category'],
       take,
       skip,
       where: { description: Like(`%${search}%`), categoryId: Like(categoryId) }
