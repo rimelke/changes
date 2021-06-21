@@ -6,7 +6,8 @@ import {
   FiDisc,
   FiTruck,
   FiBriefcase,
-  FiPenTool
+  FiPenTool,
+  FiGrid
 } from 'react-icons/fi'
 
 const items = [
@@ -20,7 +21,8 @@ const items = [
   { name: 'Produtos', icon: FiPackage, path: '/products' },
   { name: 'Tecidos', icon: FiDisc, path: '/fabrics' },
   { name: 'Fornecedores', icon: FiTruck, path: '/providers' },
-  { name: 'Rascunhos', icon: FiPenTool, path: '/drafts' }
+  { name: 'Rascunhos', icon: FiPenTool, path: '/drafts' },
+  { name: 'Categorias', icon: FiGrid, path: '/categories' }
 ]
 
 const Sidebar = () => {

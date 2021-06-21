@@ -9,6 +9,7 @@ import NewProduct from './pages/NewProduct'
 import Groups from './pages/Groups'
 import EditProduct from './pages/EditProduct'
 import Drafts from './pages/Drafts'
+import Categories from './pages/Categories'
 
 const Routes: React.FC = () => {
   return (
@@ -22,6 +23,7 @@ const Routes: React.FC = () => {
         <Route path="/products/:id" exact component={EditProduct} />
         <Route path="/groups" exact component={Groups} />
         <Route path="/drafts" exact component={Drafts} />
+        <Route path="/categories" exact component={Categories} />
       </Switch>
     </BrowserRouter>
   )
