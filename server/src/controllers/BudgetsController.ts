@@ -17,6 +17,26 @@ class BudgetsController {
 
     res.status(201).json()
   }
+
+  async update(req: Request, res: Response) {
+    const { id } = req.params
+
+    const budgetsService = new BudgetsService()
+
+    await budgetsService.updateBudget(id, req.body)
+
+    res.send()
+  }
+
+  async delete(req: Request, res: Response) {
+    const { id } = req.params
+
+    const budgetsService = new BudgetsService()
+
+    await budgetsService.deleteBudget(id)
+
+    res.send()
+  }
 }
 
 export default BudgetsController

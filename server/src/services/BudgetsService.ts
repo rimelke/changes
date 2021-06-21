@@ -18,6 +18,13 @@ interface ICreateBudgetData {
   date: Date
 }
 
+interface IUpdateBudgetData {
+  categoryId?: string
+  description?: string
+  value?: number
+  date?: Date | string
+}
+
 class BudgetsService {
   private budgetsRepository: BudgetsRepository
   private categoriesRepository: CategoriesRepository
@@ -71,6 +78,37 @@ class BudgetsService {
     })
 
     await this.budgetsRepository.save(budget)
+  }
+
+  async updateBudget(id: string, data: IUpdateBudgetData) {
+    const schema = Joi.object()
+      .keys({
+        categoryId: Joi.string(),
+        description: Joi.string(),
+        value: Joi.number().positive().precision(2),
+        date: Joi.date()
+      })
+      .min(1)
+
+    const value: IUpdateBudgetData = await schema.validateAsync(data)
+
+    if (value.categoryId) {
+      const categoryExists = await this.categoriesRepository.findOne(
+        value.categoryId
+      )
+
+      if (!categoryExists) throw new AppError('Invalid categoryId.')
+    }
+
+    if (value.date) {
+      value.date = new Date(value.date).toISOString().split('T')[0]
+    }
+
+    await this.budgetsRepository.update({ id }, value)
+  }
+
+  async deleteBudget(id: string) {
+    await this.budgetsRepository.delete({ id })
   }
 }
 
