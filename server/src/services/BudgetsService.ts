@@ -51,6 +51,7 @@ class BudgetsService {
 
     return this.budgetsRepository.find({
       relations: ['category'],
+      order: { date: 'DESC' },
       take,
       skip,
       where: { description: Like(`%${search}%`), categoryId: Like(categoryId) }
