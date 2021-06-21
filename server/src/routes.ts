@@ -6,6 +6,7 @@ import CategoriesController from './controllers/CategoriesController'
 import GroupsController from './controllers/GroupsController'
 import ProductsController from './controllers/ProductsController'
 import ProvidersController from './controllers/ProvidersController'
+import BudgetsController from './controllers/BudgetsController'
 
 const groupsController = new GroupsController()
 const providersController = new ProvidersController()
@@ -14,6 +15,7 @@ const productsController = new ProductsController()
 const draftsController = new DraftsController()
 const changesController = new ChangesController()
 const categoriesController = new CategoriesController()
+const budgetsController = new BudgetsController()
 
 const routes = Router()
 
@@ -51,5 +53,7 @@ routes.delete('/changes/:id', changesController.delete)
 routes.get('/categories', categoriesController.index)
 routes.post('/categories', categoriesController.create)
 routes.put('/categories/:id', categoriesController.update)
+
+routes.post('/budgets', budgetsController.create)
 
 export default routes
