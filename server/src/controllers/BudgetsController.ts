@@ -2,10 +2,18 @@ import { Request, Response } from 'express'
 import BudgetsService from '../services/BudgetsService'
 
 class BudgetsController {
-  async create(req: Request, res: Response) {
-    const budgetsServide = new BudgetsService()
+  async index(req: Request, res: Response) {
+    const budgetsService = new BudgetsService()
 
-    await budgetsServide.createBudget(req.body)
+    const budgets = await budgetsService.getBudgets(req.query)
+
+    res.json(budgets)
+  }
+
+  async create(req: Request, res: Response) {
+    const budgetsService = new BudgetsService()
+
+    await budgetsService.createBudget(req.body)
 
     res.status(201).json()
   }

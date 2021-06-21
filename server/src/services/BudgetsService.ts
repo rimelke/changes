@@ -1,8 +1,15 @@
 import Joi from 'joi'
-import { getCustomRepository } from 'typeorm'
+import { getCustomRepository, Like } from 'typeorm'
 import AppError from '../errors/AppError'
 import BudgetsRepository from '../repositories/BudgetsRepository'
 import CategoriesRepository from '../repositories/CategoriesRepository'
+
+interface IGetBudgetsParams {
+  take?: number
+  skip?: number
+  search?: string
+  categoryId?: string
+}
 
 interface ICreateBudgetData {
   categoryId: string
@@ -18,6 +25,28 @@ class BudgetsService {
   constructor() {
     this.budgetsRepository = getCustomRepository(BudgetsRepository)
     this.categoriesRepository = getCustomRepository(CategoriesRepository)
+  }
+
+  async getBudgets(params: IGetBudgetsParams) {
+    const schema = Joi.object().keys({
+      take: Joi.number().positive().integer().max(200),
+      skip: Joi.number().integer().min(0),
+      search: Joi.string().lowercase(),
+      categoryId: Joi.string()
+    })
+
+    const {
+      search = '',
+      skip = 0,
+      take = 50,
+      categoryId = '%'
+    }: IGetBudgetsParams = await schema.validateAsync(params)
+
+    return this.budgetsRepository.find({
+      take,
+      skip,
+      where: { description: Like(`%${search}%`), categoryId: Like(categoryId) }
+    })
   }
 
   async createBudget(data: ICreateBudgetData) {

@@ -54,6 +54,7 @@ routes.get('/categories', categoriesController.index)
 routes.post('/categories', categoriesController.create)
 routes.put('/categories/:id', categoriesController.update)
 
+routes.get('/budgets', budgetsController.index)
 routes.post('/budgets', budgetsController.create)
 
 export default routes
