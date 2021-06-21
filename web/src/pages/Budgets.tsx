@@ -152,7 +152,9 @@ const Budgets = () => {
                 {budget.category.name}
               </Td>
               <Td>{budget.description}</Td>
-              <Td>{new Date(budget.date).toLocaleDateString('pt-br')}</Td>
+              <Td>
+                {new Date(budget.date + ' 00:00').toLocaleDateString('pt-br')}
+              </Td>
               <Td isNumeric>
                 {budget.value.toLocaleString('pt-BR', {
                   style: 'currency',
