@@ -10,6 +10,7 @@ import Groups from './pages/Groups'
 import EditProduct from './pages/EditProduct'
 import Drafts from './pages/Drafts'
 import Categories from './pages/Categories'
+import Budgets from './pages/Budgets'
 
 const Routes: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const Routes: React.FC = () => {
         <Route path="/groups" exact component={Groups} />
         <Route path="/drafts" exact component={Drafts} />
         <Route path="/categories" exact component={Categories} />
+        <Route path="/budgets" exact component={Budgets} />
       </Switch>
     </BrowserRouter>
   )
