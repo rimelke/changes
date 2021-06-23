@@ -15,7 +15,8 @@ import {
   ModalCloseButton,
   ModalHeader,
   ModalBody,
-  useToast
+  useToast,
+  Select as ChakraSelect
 } from '@chakra-ui/react'
 import { Form } from '@unform/web'
 import { useState } from 'react'
@@ -27,7 +28,16 @@ import IBudget from '../types/IBudget'
 import ICategory from '../types/ICategory'
 
 const Budgets = () => {
-  const { data: budgets, mutate } = useGet<IBudget[]>('/budgets')
+  const [search, setSearch] = useState<string | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  )
+
+  const { data: budgets, mutate } = useGet<IBudget[]>(
+    `/budgets?${search !== null ? `search=${encodeURIComponent(search)}` : ''}${
+      selectedCategoryId !== null ? `&categoryId=${selectedCategoryId}` : ''
+    }`
+  )
   const { data: categories } = useGet<ICategory[]>('/categories')
   const toast = useToast()
 
@@ -75,10 +85,25 @@ const Budgets = () => {
         Orçamento
       </Heading>
 
-      <Flex mt={4}>
-        <Button onClick={newBudgetOnOpen} colorScheme="green">
+      <Flex
+        as={Form}
+        onSubmit={(data: any) => setSearch(data.search || null)}
+        mt={4}>
+        <Button flex={1} onClick={newBudgetOnOpen} colorScheme="green">
           Adicionar
         </Button>
+        <ChakraSelect
+          onChange={(e) => setSelectedCategoryId(e.target.value || null)}
+          placeholder="Filtre por categoria"
+          flex={3}
+          ml={4}>
+          {categories?.map((category) => (
+            <option value={category.id} key={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </ChakraSelect>
+        <Input name="search" placeholder="Pesquise por algo" flex={9} ml={4} />
       </Flex>
 
       <Modal isOpen={newBudgetIsOpen} onClose={newBudgetOnClose}>
