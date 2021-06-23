@@ -17,7 +17,8 @@ import {
   ModalBody,
   useToast,
   Select as ChakraSelect,
-  Skeleton
+  Skeleton,
+  IconButton
 } from '@chakra-ui/react'
 import { Form } from '@unform/web'
 import { useState } from 'react'
@@ -27,6 +28,7 @@ import withSidebar from '../hooks/withSidebar'
 import api from '../services/api'
 import IBudget from '../types/IBudget'
 import ICategory from '../types/ICategory'
+import { FiEdit } from 'react-icons/fi'
 
 const Budgets = () => {
   const [search, setSearch] = useState<string | null>(null)
@@ -48,6 +50,14 @@ const Budgets = () => {
     onOpen: newBudgetOnOpen
   } = useDisclosure()
   const [newBudgetIsLoading, setNewBudgetIsLoading] = useState(false)
+
+  const {
+    isOpen: editBudgetIsOpen,
+    onClose: editBudgetOnClose,
+    onOpen: editBudgetOnOpen
+  } = useDisclosure()
+  const [editBudget, setEditBudget] = useState<IBudget | null>(null)
+  const [editBudgetIsLoading, setEditBudgetIsLoading] = useState(false)
 
   function handleNewBudgetSubmit(data: {
     description: string
@@ -78,6 +88,39 @@ const Budgets = () => {
         })
       )
       .finally(() => setNewBudgetIsLoading(false))
+  }
+
+  function handleEditBudgetSubmit(data: {
+    description: string
+    date: string
+    value: string
+    categoryId: string
+  }) {
+    if (editBudget) {
+      setEditBudgetIsLoading(true)
+
+      api
+        .put(`/budgets/${editBudget?.id}`, {
+          ...data,
+          value: Number(
+            data.value.replace('R$ ', '').replace('.', '').replace(',', '.')
+          )
+        })
+        .then(() => {
+          mutate()
+          editBudgetOnClose()
+        })
+        .catch(() =>
+          toast({
+            title: 'Um erro inesperado ocorreu!',
+            description: 'Recarregue a página e tente novamente',
+            status: 'error',
+            position: 'bottom-left',
+            isClosable: true
+          })
+        )
+        .finally(() => setEditBudgetIsLoading(false))
+    }
   }
 
   return (
@@ -159,6 +202,60 @@ const Budgets = () => {
         </ModalContent>
       </Modal>
 
+      {editBudget && (
+        <Modal isOpen={editBudgetIsOpen} onClose={editBudgetOnClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Editar registro</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Form initialData={editBudget} onSubmit={handleEditBudgetSubmit}>
+                <Select isRequired name="categoryId">
+                  {categories?.map((category) => (
+                    <option value={category.id} key={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </Select>
+                <Input
+                  mt={2}
+                  isRequired
+                  name="description"
+                  placeholder="Digite a descrição"
+                />
+                <Input isRequired mt={2} name="date" type="date" />
+                <MaskInput
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale
+                  isRequired
+                  mt={2}
+                  thousandSeparator="."
+                  prefix="R$ "
+                  placeholder="Digite o valor"
+                  name="value"
+                />
+                <Flex justifyContent="flex-end" mt={4}>
+                  <Button
+                    onClick={editBudgetOnClose}
+                    colorScheme="red"
+                    mr={2}
+                    variant="ghost">
+                    Cancelar
+                  </Button>
+                  <Button
+                    isLoading={editBudgetIsLoading}
+                    type="submit"
+                    colorScheme="green">
+                    Salvar
+                  </Button>
+                </Flex>
+              </Form>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
+
       <Table borderWidth="1px" mt={4}>
         <Thead>
           <Tr>
@@ -166,23 +263,24 @@ const Budgets = () => {
             <Th>Descrição</Th>
             <Th>Data</Th>
             <Th isNumeric>Valor</Th>
+            <Th />
           </Tr>
         </Thead>
         <Tbody>
           {!budgets ? (
             <>
               <Tr>
-                <Skeleton colspan={4} as={Td}>
+                <Skeleton colspan={5} as={Td}>
                   A
                 </Skeleton>
               </Tr>
               <Tr>
-                <Skeleton colspan={4} as={Td}>
+                <Skeleton colspan={5} as={Td}>
                   A
                 </Skeleton>
               </Tr>
               <Tr>
-                <Skeleton colspan={4} as={Td}>
+                <Skeleton colspan={5} as={Td}>
                   A
                 </Skeleton>
               </Tr>
@@ -205,6 +303,19 @@ const Budgets = () => {
                     style: 'currency',
                     currency: 'BRL'
                   })}
+                </Td>
+                <Td isNumeric>
+                  <IconButton
+                    colorScheme="orange"
+                    borderRadius={7}
+                    onClick={() => {
+                      setEditBudget(budget)
+                      editBudgetOnOpen()
+                    }}
+                    size="sm"
+                    aria-label="Editar registro"
+                    icon={<FiEdit />}
+                  />
                 </Td>
               </Tr>
             ))
