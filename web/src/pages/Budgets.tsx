@@ -16,7 +16,8 @@ import {
   ModalHeader,
   ModalBody,
   useToast,
-  Select as ChakraSelect
+  Select as ChakraSelect,
+  Skeleton
 } from '@chakra-ui/react'
 import { Form } from '@unform/web'
 import { useState } from 'react'
@@ -168,26 +169,46 @@ const Budgets = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {budgets?.map((budget) => (
-            <Tr _hover={{ bg: 'gray.50' }} key={budget.id}>
-              <Td
-                color={
-                  budget.category.type === 'INCOME' ? 'green.600' : 'red.600'
-                }>
-                {budget.category.name}
-              </Td>
-              <Td>{budget.description}</Td>
-              <Td>
-                {new Date(budget.date + ' 00:00').toLocaleDateString('pt-br')}
-              </Td>
-              <Td isNumeric>
-                {budget.value.toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL'
-                })}
-              </Td>
-            </Tr>
-          ))}
+          {!budgets ? (
+            <>
+              <Tr>
+                <Skeleton colspan={4} as={Td}>
+                  A
+                </Skeleton>
+              </Tr>
+              <Tr>
+                <Skeleton colspan={4} as={Td}>
+                  A
+                </Skeleton>
+              </Tr>
+              <Tr>
+                <Skeleton colspan={4} as={Td}>
+                  A
+                </Skeleton>
+              </Tr>
+            </>
+          ) : (
+            budgets.map((budget) => (
+              <Tr _hover={{ bg: 'gray.50' }} key={budget.id}>
+                <Td
+                  color={
+                    budget.category.type === 'INCOME' ? 'green.600' : 'red.600'
+                  }>
+                  {budget.category.name}
+                </Td>
+                <Td>{budget.description}</Td>
+                <Td>
+                  {new Date(budget.date + ' 00:00').toLocaleDateString('pt-br')}
+                </Td>
+                <Td isNumeric>
+                  {budget.value.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  })}
+                </Td>
+              </Tr>
+            ))
+          )}
         </Tbody>
       </Table>
     </Flex>

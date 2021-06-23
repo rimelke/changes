@@ -32,8 +32,9 @@ const BaseFabrics: FC<Params> = ({ baseFabrics, setBaseFabrics }) => {
 
   const [nextOrderId, setNextOrderId] = useState(1)
 
-  const [selectedProviderId, setSelectedProviderId] =
-    useState<string | null>(null)
+  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
+    null
+  )
   const [editingFabrics, setEditingFabrics] = useState<string[]>([])
 
   function cancelEditFabric(orderId: string) {
