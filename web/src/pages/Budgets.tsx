@@ -18,7 +18,9 @@ import {
   useToast,
   Select as ChakraSelect,
   Skeleton,
-  IconButton
+  Text,
+  IconButton,
+  ModalFooter
 } from '@chakra-ui/react'
 import { Form } from '@unform/web'
 import { useState } from 'react'
@@ -28,7 +30,7 @@ import withSidebar from '../hooks/withSidebar'
 import api from '../services/api'
 import IBudget from '../types/IBudget'
 import ICategory from '../types/ICategory'
-import { FiEdit } from 'react-icons/fi'
+import { FiEdit, FiTrash } from 'react-icons/fi'
 
 const Budgets = () => {
   const [search, setSearch] = useState<string | null>(null)
@@ -58,6 +60,14 @@ const Budgets = () => {
   } = useDisclosure()
   const [editBudget, setEditBudget] = useState<IBudget | null>(null)
   const [editBudgetIsLoading, setEditBudgetIsLoading] = useState(false)
+
+  const {
+    isOpen: delBudgetIsOpen,
+    onClose: delBudgetOnClose,
+    onOpen: delBudgetOnOpen
+  } = useDisclosure()
+  const [delBudget, setDelBudget] = useState<IBudget | null>(null)
+  const [delBudgetIsLoading, setDelBudgetIsLoading] = useState(false)
 
   function handleNewBudgetSubmit(data: {
     description: string
@@ -120,6 +130,30 @@ const Budgets = () => {
           })
         )
         .finally(() => setEditBudgetIsLoading(false))
+    }
+  }
+
+  function handleDelBudgetSubmit() {
+    if (delBudget) {
+      setDelBudgetIsLoading(true)
+
+      api
+        .delete(`/budgets/${delBudget.id}`)
+        .then(() => {
+          mutate()
+          delBudgetOnClose()
+          setDelBudget(null)
+        })
+        .catch(() =>
+          toast({
+            title: 'Um erro inesperado ocorreu!',
+            description: 'Recarregue a página e tente novamente',
+            status: 'error',
+            position: 'bottom-left',
+            isClosable: true
+          })
+        )
+        .finally(() => setDelBudgetIsLoading(false))
     }
   }
 
@@ -256,6 +290,51 @@ const Budgets = () => {
         </Modal>
       )}
 
+      {delBudget && (
+        <Modal isOpen={delBudgetIsOpen} onClose={delBudgetOnClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Apagar registro</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Você tem certeza que deseja apagar o seguinte registro?
+              </Text>
+              <br />
+              <Text
+                color={
+                  delBudget.category.type === 'INCOME' ? 'green.600' : 'red.600'
+                }>
+                {delBudget.category.name}
+              </Text>
+              <Text fontWeight="semibold">{delBudget.description}</Text>
+              <Text>
+                {new Date(delBudget.date + ' 00:00').toLocaleDateString(
+                  'pt-br'
+                )}
+              </Text>
+              <Text>
+                {delBudget.value.toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                })}
+              </Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={delBudgetOnClose} mr={2} variant="ghost">
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleDelBudgetSubmit}
+                isLoading={delBudgetIsLoading}
+                colorScheme="red">
+                Apagar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
       <Table borderWidth="1px" mt={4}>
         <Thead>
           <Tr>
@@ -315,6 +394,18 @@ const Budgets = () => {
                     size="sm"
                     aria-label="Editar registro"
                     icon={<FiEdit />}
+                  />
+                  <IconButton
+                    aria-label="Apagar registro"
+                    icon={<FiTrash />}
+                    onClick={() => {
+                      setDelBudget(budget)
+                      delBudgetOnOpen()
+                    }}
+                    colorScheme="red"
+                    ml={2}
+                    borderRadius={7}
+                    size="sm"
                   />
                 </Td>
               </Tr>
