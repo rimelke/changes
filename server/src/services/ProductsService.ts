@@ -66,7 +66,7 @@ class ProductsService {
         .items(
           Joi.object().keys({
             name: Joi.string().required(),
-            value: Joi.number().positive().precision(2).required()
+            value: Joi.number().min(0).precision(2).required()
           })
         )
         .default([]),
@@ -147,7 +147,7 @@ class ProductsService {
           Joi.object().keys({
             id: Joi.string().length(25),
             name: Joi.string().required(),
-            value: Joi.number().positive().precision(2).required()
+            value: Joi.number().min(0).precision(2).required()
           })
         )
         .default([]),
