@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { getCustomRepository, Like } from 'typeorm'
+import { getCustomRepository } from 'typeorm'
 import AppError from '../errors/AppError'
 import BudgetsRepository from '../repositories/BudgetsRepository'
 import CategoriesRepository from '../repositories/CategoriesRepository'
@@ -49,13 +49,16 @@ class BudgetsService {
       categoryId = '%'
     }: IGetBudgetsParams = await schema.validateAsync(params)
 
-    return this.budgetsRepository.find({
-      relations: ['category'],
-      order: { date: 'DESC' },
-      take,
-      skip,
-      where: { description: Like(`%${search}%`), categoryId: Like(categoryId) }
-    })
+    return this.budgetsRepository
+      .createQueryBuilder('budgets')
+      .innerJoinAndSelect('budgets.category', 'category')
+      .take(take)
+      .skip(skip)
+      .where('LOWER(budgets.description) LIKE :search', {
+        search: `%${search}%`
+      })
+      .andWhere('budgets.categoryId LIKE :categoryId', { categoryId })
+      .getMany()
   }
 
   async createBudget(data: ICreateBudgetData) {
