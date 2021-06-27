@@ -9,11 +9,11 @@ import {
   AlertDialogOverlay,
   AlertDialogContent,
   AlertDialogHeader,
-  Input,
   AlertDialogBody,
   Box,
   AlertDialogFooter,
-  Select
+  Select,
+  Skeleton
 } from '@chakra-ui/react'
 import withSidebar from '../hooks/withSidebar'
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
@@ -24,6 +24,8 @@ import { useRef, useState } from 'react'
 import IProduct from '../types/IProduct'
 import IGroup from '../types/IGroup'
 import getProducts from '../hooks/getProducts'
+import { Input } from '../components/Form'
+import { Form } from '@unform/web'
 
 const Products = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
@@ -69,6 +71,10 @@ const Products = () => {
     }
   }
 
+  function handleSearch(data: { search: string }) {
+    setSearch(data.search)
+  }
+
   return (
     <Flex flexDir="column" as="main" flex={1} mt={4} pr={8}>
       <Heading size="lg" color="teal.500">
@@ -79,7 +85,7 @@ const Products = () => {
           Novo
         </Button>
       </Flex>
-      <Flex mt={4}>
+      <Flex as={Form} onSubmit={(data: any) => handleSearch(data)} mt={4}>
         <Select
           flex={1}
           onChange={(e) =>
@@ -93,10 +99,10 @@ const Products = () => {
           ))}
         </Select>
         <Input
+          name="search"
           placeholder="Digite para pesquisar"
           flex={3}
           ml={4}
-          onChange={(e) => setSearch(e.target.value.toLowerCase())}
         />
       </Flex>
       <AlertDialog
@@ -157,8 +163,20 @@ const Products = () => {
           </Text>
           <Box w="68px" />
         </Flex>
-        {products &&
-          products.map((product) => (
+        {!products ? (
+          <>
+            <Skeleton p={3} borderRadius={7}>
+              A
+            </Skeleton>
+            <Skeleton p={3} borderRadius={7}>
+              A
+            </Skeleton>
+            <Skeleton p={3} borderRadius={7}>
+              A
+            </Skeleton>
+          </>
+        ) : (
+          products?.map((product) => (
             <Flex
               key={product.id}
               alignItems="center"
@@ -216,7 +234,8 @@ const Products = () => {
                 />
               </Flex>
             </Flex>
-          ))}
+          ))
+        )}
       </Stack>
     </Flex>
   )

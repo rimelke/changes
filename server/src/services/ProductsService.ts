@@ -24,21 +24,23 @@ class ProductsService {
       search: Joi.string().lowercase()
     })
 
-    const value = await schema.validateAsync(params)
-
-    let whereClause = ''
-    if (value.groupId) whereClause += `groupId = '${value.groupId}'`
-    if (value.search) {
-      if (value.groupId) whereClause += ' AND '
-      whereClause += `(LOWER(products.name) LIKE '%${value.search}%' OR LOWER(ref) LIKE '%${value.search}%')`
-    }
+    const {
+      take = 25,
+      skip = 0,
+      groupId = '%',
+      search = ''
+    } = await schema.validateAsync(params)
 
     const [data, total] = await this.productsRepository
       .createQueryBuilder('products')
       .innerJoinAndSelect('products.group', 'group')
-      .take(value.take)
-      .skip(value.skip)
-      .where(whereClause)
+      .take(take)
+      .skip(skip)
+      .where('products.groupId LIKE :groupId', { groupId })
+      .andWhere(
+        'LOWER(products.ref) LIKE :search OR LOWER(products.name) LIKE :search',
+        { search: `%${search}%` }
+      )
       .getManyAndCount()
 
     return { total, data }
