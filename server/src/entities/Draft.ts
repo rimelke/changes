@@ -25,6 +25,9 @@ class Draft {
   @Column({ unique: true })
   name: string
 
+  @Column({ default: 'Rascunho' })
+  situation: string
+
   @CreateDateColumn()
   createdAt: Date
 
