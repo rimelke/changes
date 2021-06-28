@@ -198,6 +198,15 @@ const Drafts = () => {
                       </option>
                     ))}
                   </Select>
+                  <Select
+                    name="situation"
+                    isRequired
+                    mt={4}
+                    placeholder="Selecione a situação">
+                    <option value="Rascunho">Rascunho</option>
+                    <option value="Aprovado">Aprovado</option>
+                    <option value="Pronto">Pronto</option>
+                  </Select>
                   <Flex mt={6} justifyContent="flex-end">
                     <Button
                       onClick={editDraftOnClose}
@@ -249,6 +258,10 @@ const Drafts = () => {
                 <Flex justifyContent="space-between">
                   <Text color="gray.500">Coleção:</Text>
                   <Text color="gray.500">{selectedDraft.group.name}</Text>
+                </Flex>
+                <Flex justifyContent="space-between">
+                  <Text color="gray.500">Situação:</Text>
+                  <Text color="gray.500">{selectedDraft.situation}</Text>
                 </Flex>
                 <Flex justifyContent="space-between">
                   <Text color="gray.500">Última modificação:</Text>
@@ -319,6 +332,9 @@ const Drafts = () => {
           <Text fontWeight="bold" flex={3}>
             Nome
           </Text>
+          <Text fontWeight="bold" flex={2}>
+            Situação
+          </Text>
           <Text fontWeight="bold" flex={1}>
             Últ. Modificação
           </Text>
@@ -339,6 +355,7 @@ const Drafts = () => {
             borderRadius={7}>
             <Text flex={1}>{draft.group.name}</Text>
             <Text flex={3}>{draft.name}</Text>
+            <Text flex={2}>{draft.situation}</Text>
             <Text flex={1}>{new Date(draft.updatedAt).toLocaleString()}</Text>
           </Flex>
         ))}
