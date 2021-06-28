@@ -68,7 +68,8 @@ class DraftsService {
     const schema = Joi.object()
       .keys({
         groupId: Joi.string(),
-        name: Joi.string()
+        name: Joi.string(),
+        situation: Joi.string()
       })
       .min(1)
 
