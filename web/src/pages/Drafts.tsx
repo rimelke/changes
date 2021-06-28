@@ -266,7 +266,13 @@ const Drafts = () => {
                 <Flex justifyContent="space-between">
                   <Text color="gray.500">Última modificação:</Text>
                   <Text color="gray.500">
-                    {new Date(selectedDraft.updatedAt).toLocaleString()}
+                    {new Date(selectedDraft.updatedAt).toLocaleString('pt-br', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
                   </Text>
                 </Flex>
                 <Flex mt={6} alignItems="center" justifyContent="space-between">
@@ -356,7 +362,15 @@ const Drafts = () => {
             <Text flex={1}>{draft.group.name}</Text>
             <Text flex={3}>{draft.name}</Text>
             <Text flex={2}>{draft.situation}</Text>
-            <Text flex={1}>{new Date(draft.updatedAt).toLocaleString()}</Text>
+            <Text flex={1}>
+              {new Date(draft.updatedAt).toLocaleString('pt-br', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: 'numeric',
+                minute: '2-digit'
+              })}
+            </Text>
           </Flex>
         ))}
       </Stack>
