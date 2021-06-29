@@ -16,6 +16,7 @@ import {
   ModalHeader,
   ModalOverlay
 } from '@chakra-ui/modal'
+import { Table, Tbody, Thead, Th, Td, Tr } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import { useGet } from '../hooks/useGet'
 import withSidebar from '../hooks/withSidebar'
@@ -326,55 +327,44 @@ const Drafts = () => {
           </Modal>
         </>
       )}
-      <Stack mt={4}>
-        <Flex
-          borderWidth="1px"
-          px={3}
-          py={1}
-          alignItems="center"
-          borderRadius={7}>
-          <Text fontWeight="bold" flex={1}>
-            Coleção
-          </Text>
-          <Text fontWeight="bold" flex={3}>
-            Nome
-          </Text>
-          <Text fontWeight="bold" flex={2}>
-            Situação
-          </Text>
-          <Text fontWeight="bold" flex={1}>
-            Últ. Modificação
-          </Text>
-        </Flex>
-        {drafts?.map((draft) => (
-          <Flex
-            key={draft.id}
-            borderWidth="1px"
-            px={3}
-            _hover={{ bg: 'gray.50' }}
-            cursor="pointer"
-            onClick={() => {
-              setSelectedDraftId(draft.id)
-              onOpen()
-            }}
-            py={1}
-            alignItems="center"
-            borderRadius={7}>
-            <Text flex={1}>{draft.group.name}</Text>
-            <Text flex={3}>{draft.name}</Text>
-            <Text flex={2}>{draft.situation}</Text>
-            <Text flex={1}>
-              {new Date(draft.updatedAt).toLocaleString('pt-br', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: 'numeric',
-                minute: '2-digit'
-              })}
-            </Text>
-          </Flex>
-        ))}
-      </Stack>
+
+      <Table mt={4} borderWidth="1px">
+        <Thead>
+          <Tr>
+            <Th>Coleção</Th>
+            <Th>Tipo</Th>
+            <Th>Nome</Th>
+            <Th>Situação</Th>
+            <Th>Últ. Modificação</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {drafts?.map((draft) => (
+            <Tr
+              _hover={{ bg: 'gray.50' }}
+              cursor="pointer"
+              onClick={() => {
+                setSelectedDraftId(draft.id)
+                onOpen()
+              }}
+              key={draft.id}>
+              <Td>{draft.group.name}</Td>
+              <Td>{draft.type}</Td>
+              <Td>{draft.name}</Td>
+              <Td>{draft.situation}</Td>
+              <Td>
+                {new Date(draft.updatedAt).toLocaleString('pt-br', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: 'numeric',
+                  minute: '2-digit'
+                })}
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
     </Flex>
   )
 }
