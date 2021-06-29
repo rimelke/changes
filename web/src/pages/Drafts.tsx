@@ -83,6 +83,7 @@ const Drafts = () => {
         })
         .then(() => {
           mutate()
+          draftsMutate()
           newChangeOnClose()
         })
         .catch(() =>

@@ -37,6 +37,10 @@ class ChangesService {
     const change = this.changesRepository.create(value)
 
     await this.changesRepository.save(change)
+
+    await this[
+      referenceType === 'product' ? 'productsRepository' : 'draftsRepository'
+    ].update({ id: value.referenceId }, {})
   }
 
   async updateChange(id: string, data: any) {
