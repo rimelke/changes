@@ -16,7 +16,15 @@ import {
   ModalHeader,
   ModalOverlay
 } from '@chakra-ui/modal'
-import { Table, Tbody, Thead, Th, Td, Tr } from '@chakra-ui/react'
+import {
+  Table,
+  Tbody,
+  Thead,
+  Th,
+  Td,
+  Tr,
+  Select as ChakraSelect
+} from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import { useGet } from '../hooks/useGet'
 import withSidebar from '../hooks/withSidebar'
@@ -32,7 +40,24 @@ import IGroup from '../types/IGroup'
 import { useToast } from '@chakra-ui/toast'
 
 const Drafts = () => {
-  const { data: drafts, mutate: draftsMutate } = useGet<IDraft[]>('/drafts')
+  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
+  const [search, setSearch] = useState<string | null>(null)
+  const [selectedSituation, setSelectedSituation] = useState<string | null>(
+    null
+  )
+
+  const { data: drafts, mutate: draftsMutate } = useGet<IDraft[]>(
+    `/drafts?` +
+      (selectedType !== null
+        ? `type=${encodeURIComponent(selectedType)}`
+        : '') +
+      (selectedGroupId !== null ? `&groupId=${selectedGroupId}` : '') +
+      (selectedSituation !== null
+        ? `&situation=${encodeURIComponent(selectedSituation)}`
+        : '') +
+      (search !== null ? `&search=${encodeURIComponent(search)}` : '')
+  )
   const { data: groups } = useGet<IGroup[]>('/groups')
 
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null)
@@ -156,10 +181,47 @@ const Drafts = () => {
       <Heading size="lg" color="teal.500">
         Rascunhos
       </Heading>
-      <Flex mt={4}>
+      <Flex
+        as={Form}
+        onSubmit={(data: any) => setSearch(data.search || null)}
+        gridGap={4}
+        mt={4}>
         <Button colorScheme="teal" onClick={newDraftOnOpen}>
           Novo
         </Button>
+        <ChakraSelect
+          width="max-content"
+          placeholder="Filtre por coleção"
+          onChange={(e) => setSelectedGroupId(e.target.value || null)}>
+          {groups?.map((group) => (
+            <option key={group.id} value={group.id}>
+              {group.name}
+            </option>
+          ))}
+        </ChakraSelect>
+        <ChakraSelect
+          width="max-content"
+          placeholder="Filtre por tipo"
+          onChange={(e) => setSelectedType(e.target.value || null)}>
+          <option value="Bermuda">Bermuda</option>
+          <option value="Blusa">Blusa</option>
+          <option value="Calça">Calça</option>
+          <option value="Casaco">Casaco</option>
+          <option value="Conjunto">Conjunto</option>
+          <option value="Jaqueta">Jaqueta</option>
+          <option value="Macacão">Macacão</option>
+          <option value="Moletom">Moletom</option>
+          <option value="Vestido">Vestido</option>
+        </ChakraSelect>
+        <ChakraSelect
+          width="max-content"
+          placeholder="Filtre por situação"
+          onChange={(e) => setSelectedSituation(e.target.value || null)}>
+          <option value="Rascunho">Rascunho</option>
+          <option value="Aprovado">Aprovado</option>
+          <option value="Pronto">Pronto</option>
+        </ChakraSelect>
+        <Input name="search" placeholder="Pesquise por algo" flex={1} />
       </Flex>
 
       <Modal isOpen={newDraftIsOpen} onClose={newDraftOnClose}>

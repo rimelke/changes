@@ -4,6 +4,13 @@ import AppError from '../errors/AppError'
 import DraftsRepository from '../repositories/DraftsRepository'
 import GroupsRepository from '../repositories/GroupsRepository'
 
+interface IGetDraftsParams {
+  type?: string
+  groupId?: string
+  situation?: string
+  search?: string
+}
+
 interface ICreateDraftData {
   name: string
   groupId: string
@@ -19,11 +26,30 @@ class DraftsService {
     this.groupsRepository = getCustomRepository(GroupsRepository)
   }
 
-  async getDrafts() {
+  async getDrafts(data: IGetDraftsParams) {
+    const schema = Joi.object().keys({
+      type: Joi.string(),
+      groupId: Joi.string(),
+      situation: Joi.string(),
+      search: Joi.string().lowercase()
+    })
+
+    const {
+      type,
+      groupId = '%',
+      situation = '%',
+      search = ''
+    }: IGetDraftsParams = await schema.validateAsync(data)
+
     return this.draftsRepository
       .createQueryBuilder('drafts')
       .innerJoinAndSelect('drafts.group', 'group')
+      .where(type ? 'drafts.type = :type' : '1=1', { type })
+      .andWhere('drafts.groupId LIKE :groupId', { groupId })
+      .andWhere('drafts.situation LIKE :situation', { situation })
+      .andWhere('LOWER(drafts.name) LIKE :search', { search: `%${search}%` })
       .orderBy('drafts.updatedAt', 'DESC')
+      .limit(30)
       .getMany()
   }
 

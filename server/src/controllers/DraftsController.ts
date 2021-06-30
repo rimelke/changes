@@ -5,7 +5,7 @@ class DraftsController {
   async index(req: Request, res: Response) {
     const draftsService = new DraftsService()
 
-    const drafts = await draftsService.getDrafts()
+    const drafts = await draftsService.getDrafts(req.query)
 
     res.json(drafts)
   }
