@@ -38,7 +38,7 @@ class ProductsService {
       .skip(skip)
       .where('products.groupId LIKE :groupId', { groupId })
       .andWhere(
-        'LOWER(products.ref) LIKE :search OR LOWER(products.name) LIKE :search',
+        '(LOWER(products.ref) LIKE :search OR LOWER(products.name) LIKE :search)',
         { search: `%${search}%` }
       )
       .getManyAndCount()
