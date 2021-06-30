@@ -7,6 +7,7 @@ import GroupsRepository from '../repositories/GroupsRepository'
 interface ICreateDraftData {
   name: string
   groupId: string
+  type?: string | null
 }
 
 class DraftsService {
@@ -44,7 +45,8 @@ class DraftsService {
   async createDraft(data: ICreateDraftData) {
     const schema = Joi.object<ICreateDraftData>().keys({
       groupId: Joi.string().required(),
-      name: Joi.string().required()
+      name: Joi.string().required(),
+      type: Joi.string()
     })
 
     const value: ICreateDraftData = await schema.validateAsync(data)
@@ -69,7 +71,8 @@ class DraftsService {
       .keys({
         groupId: Joi.string(),
         name: Joi.string(),
-        situation: Joi.string()
+        situation: Joi.string(),
+        type: Joi.string()
       })
       .min(1)
 

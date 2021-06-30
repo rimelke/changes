@@ -5,6 +5,7 @@ interface IDraft {
   name: string
   groupId: string
   situation: string
+  type: string | null
   createdAt: string
   updatedAt: string
   group: IGroup

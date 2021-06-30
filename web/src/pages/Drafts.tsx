@@ -100,7 +100,11 @@ const Drafts = () => {
     }
   }
 
-  function handleSubmitEditDraft(data: { name: string; groupId: string }) {
+  function handleSubmitEditDraft(data: {
+    name: string
+    groupId: string
+    type: string
+  }) {
     if (selectedDraftId) {
       setEditDraftLoading(true)
       api
@@ -123,7 +127,11 @@ const Drafts = () => {
     }
   }
 
-  function handleSubmitNewDraft(data: { name: string; groupId: string }) {
+  function handleSubmitNewDraft(data: {
+    name: string
+    groupId: string
+    type: string
+  }) {
     setNewDraftLoading(true)
     api
       .post('/drafts', data)
@@ -153,6 +161,7 @@ const Drafts = () => {
           Novo
         </Button>
       </Flex>
+
       <Modal isOpen={newDraftIsOpen} onClose={newDraftOnClose}>
         <ModalOverlay />
         <ModalContent>
@@ -168,6 +177,17 @@ const Drafts = () => {
                   </option>
                 ))}
               </Select>
+              <Select isRequired mt={4} name="type">
+                <option value="Bermuda">Bermuda</option>
+                <option value="Blusa">Blusa</option>
+                <option value="Calça">Calça</option>
+                <option value="Casaco">Casaco</option>
+                <option value="Conjunto">Conjunto</option>
+                <option value="Jaqueta">Jaqueta</option>
+                <option value="Macacão">Macacão</option>
+                <option value="Moletom">Moletom</option>
+                <option value="Vestido">Vestido</option>
+              </Select>
               <Flex mt={6} justifyContent="flex-end">
                 <Button
                   isLoading={newDraftLoading}
@@ -181,6 +201,7 @@ const Drafts = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+
       {selectedDraft && (
         <>
           <Modal isOpen={editDraftIsOpen} onClose={editDraftOnClose}>
@@ -199,6 +220,17 @@ const Drafts = () => {
                         {group.name}
                       </option>
                     ))}
+                  </Select>
+                  <Select isRequired mt={4} name="type">
+                    <option value="Bermuda">Bermuda</option>
+                    <option value="Blusa">Blusa</option>
+                    <option value="Calça">Calça</option>
+                    <option value="Casaco">Casaco</option>
+                    <option value="Conjunto">Conjunto</option>
+                    <option value="Jaqueta">Jaqueta</option>
+                    <option value="Macacão">Macacão</option>
+                    <option value="Moletom">Moletom</option>
+                    <option value="Vestido">Vestido</option>
                   </Select>
                   <Select
                     name="situation"
@@ -260,6 +292,10 @@ const Drafts = () => {
                 <Flex justifyContent="space-between">
                   <Text color="gray.500">Coleção:</Text>
                   <Text color="gray.500">{selectedDraft.group.name}</Text>
+                </Flex>
+                <Flex justifyContent="space-between">
+                  <Text color="gray.500">Tipo:</Text>
+                  <Text color="gray.500">{selectedDraft.type || '-'}</Text>
                 </Flex>
                 <Flex justifyContent="space-between">
                   <Text color="gray.500">Situação:</Text>

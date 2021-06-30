@@ -28,6 +28,9 @@ class Draft {
   @Column({ default: 'Rascunho' })
   situation: string
 
+  @Column({ nullable: true })
+  type: string | null
+
   @CreateDateColumn()
   createdAt: Date
 
