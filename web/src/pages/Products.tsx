@@ -1,7 +1,6 @@
 import {
   Flex,
   Heading,
-  Stack,
   Text,
   IconButton,
   Button,
@@ -10,10 +9,15 @@ import {
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogBody,
-  Box,
   AlertDialogFooter,
   Select,
-  Skeleton
+  Skeleton,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td
 } from '@chakra-ui/react'
 import withSidebar from '../hooks/withSidebar'
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
@@ -80,11 +84,13 @@ const Products = () => {
       <Heading size="lg" color="teal.500">
         Produtos
       </Heading>
+
       <Flex mt={4}>
         <Button colorScheme="teal" to="/products/new" as={Link}>
           Novo
         </Button>
       </Flex>
+
       <Flex as={Form} onSubmit={(data: any) => handleSearch(data)} mt={4}>
         <Select
           flex={1}
@@ -105,6 +111,7 @@ const Products = () => {
           ml={4}
         />
       </Flex>
+
       <AlertDialog
         leastDestructiveRef={cancelRef}
         onClose={onClose}
@@ -136,109 +143,97 @@ const Products = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-      <Stack mt={4}>
-        <Flex
-          alignItems="center"
-          borderRadius={7}
-          px={3}
-          py={1}
-          borderWidth="1px">
-          <Text fontWeight="bold" flex={2}>
-            Coleção
-          </Text>
-          <Text fontWeight="bold" flex={1}>
-            Ref.
-          </Text>
-          <Text fontWeight="bold" flex={3}>
-            Nome
-          </Text>
-          <Text fontWeight="bold" textAlign="center" flex={1}>
-            Custo
-          </Text>
-          <Text fontWeight="bold" textAlign="center" flex={1}>
-            Preço
-          </Text>
-          <Text fontWeight="bold" textAlign="center" flex={1}>
-            Lucro
-          </Text>
-          <Box w="68px" />
-        </Flex>
-        {!products ? (
-          <>
-            <Skeleton p={3} borderRadius={7}>
-              A
-            </Skeleton>
-            <Skeleton p={3} borderRadius={7}>
-              A
-            </Skeleton>
-            <Skeleton p={3} borderRadius={7}>
-              A
-            </Skeleton>
-          </>
-        ) : (
-          products?.map((product) => (
-            <Flex
-              key={product.id}
-              alignItems="center"
-              borderRadius={7}
-              p={3}
-              _hover={{ bg: 'gray.50' }}
-              borderWidth="1px">
-              <Text flex={2}>{product.group.name}</Text>
-              <Text flex={1}>{product.ref}</Text>
-              <Text flex={3}>{product.name}</Text>
-              <Text textAlign="center" flex={1}>
-                {Number(product.cost).toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL'
-                })}
-              </Text>
-              <Text textAlign="center" flex={1}>
-                {Number(product.price)?.toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL'
-                })}
-              </Text>
-              <Text
-                textAlign="center"
-                flex={1}
-                fontWeight="bold"
-                color={
-                  Number(product.profit) >= Number(product.group.minimum)
-                    ? Number(product.profit) >= Number(product.group.desired)
-                      ? 'green.500'
-                      : 'yellow.500'
-                    : 'red.500'
-                }>
-                {Number(product.profit).toLocaleString('pt-br', {
-                  maximumFractionDigits: 1,
-                  minimumFractionDigits: 1
-                })}
-                %
-              </Text>
-              <Flex w="68px">
-                <IconButton
-                  size="sm"
-                  borderRadius={7}
-                  colorScheme="orange"
-                  aria-label="Editar tecido"
-                  onClick={() => history.push(`/products/${product.id}`)}
-                  icon={<FiEdit />}
-                />
-                <IconButton
-                  ml={1}
-                  borderRadius={7}
-                  size="sm"
-                  colorScheme="red"
-                  aria-label="Apagar tecido"
-                  onClick={() => handleDelete(product)}
-                  icon={<FiTrash2 />}
-                />
-              </Flex>
-            </Flex>
-          ))
-        )}
-      </Stack>
+
+      <Table borderWidth="1px" mt={4}>
+        <Thead>
+          <Tr>
+            <Th>Coleção</Th>
+            <Th>Ref.</Th>
+            <Th>Nome</Th>
+            <Th isNumeric>Custo</Th>
+            <Th isNumeric>Preço</Th>
+            <Th isNumeric>Lucro</Th>
+            <Th />
+          </Tr>
+        </Thead>
+        <Tbody>
+          {!products ? (
+            <>
+              {' '}
+              <Tr>
+                <Skeleton colspan={7} as={Td}>
+                  A
+                </Skeleton>
+              </Tr>
+              <Tr>
+                <Skeleton colspan={7} as={Td}>
+                  A
+                </Skeleton>
+              </Tr>
+              <Tr>
+                <Skeleton colspan={7} as={Td}>
+                  A
+                </Skeleton>
+              </Tr>
+            </>
+          ) : (
+            products.map((product) => (
+              <Tr _hover={{ bg: 'gray.50' }} key={product.id}>
+                <Td>{product.group.name}</Td>
+                <Td>{product.ref}</Td>
+                <Td>{product.name}</Td>
+                <Td isNumeric>
+                  {product.cost.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  })}
+                </Td>
+                <Td isNumeric>
+                  {product.price.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  })}
+                </Td>
+                <Td
+                  fontWeight="bold"
+                  color={
+                    product.profit >= product.group.minimum
+                      ? product.profit >= product.group.desired
+                        ? 'green.500'
+                        : 'yellow.500'
+                      : 'red.500'
+                  }
+                  isNumeric>
+                  {Number(product.profit).toLocaleString('pt-br', {
+                    maximumFractionDigits: 1,
+                    minimumFractionDigits: 1
+                  })}
+                  %
+                </Td>
+                <Td isNumeric>
+                  <IconButton
+                    size="sm"
+                    borderRadius={7}
+                    colorScheme="orange"
+                    aria-label="Editar produto"
+                    onClick={() => history.push(`/products/${product.id}`)}
+                    icon={<FiEdit />}
+                  />
+                  <IconButton
+                    ml={1}
+                    borderRadius={7}
+                    size="sm"
+                    colorScheme="red"
+                    aria-label="Apagar produto"
+                    onClick={() => handleDelete(product)}
+                    icon={<FiTrash2 />}
+                  />
+                </Td>
+              </Tr>
+            ))
+          )}
+        </Tbody>
+      </Table>
     </Flex>
   )
 }
