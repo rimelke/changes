@@ -164,6 +164,7 @@ const Providers = () => {
               <Flex>
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="green"
                   aria-label="Salvar edições"
                   type="submit"
@@ -173,6 +174,7 @@ const Providers = () => {
                   ml={1}
                   size="sm"
                   colorScheme="red"
+                  borderRadius={7}
                   aria-label="Cancelar edições"
                   onClick={() => cancelEdit(provider.id)}
                   icon={<FiX />}
@@ -194,6 +196,7 @@ const Providers = () => {
                 <IconButton
                   size="sm"
                   colorScheme="orange"
+                  borderRadius={7}
                   aria-label="Editar fornecedor"
                   onClick={() => handleEdit(provider.id)}
                   icon={<FiEdit />}
@@ -202,6 +205,7 @@ const Providers = () => {
                   ml={1}
                   size="sm"
                   colorScheme="red"
+                  borderRadius={7}
                   aria-label="Apagar fornecedor"
                   onClick={() => handleDelete(provider.id)}
                   icon={<FiTrash2 />}

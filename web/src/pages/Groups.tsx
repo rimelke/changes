@@ -213,6 +213,7 @@ const Groups = () => {
               <Flex>
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="green"
                   aria-label="Salvar edições"
                   type="submit"
@@ -221,6 +222,7 @@ const Groups = () => {
                 <IconButton
                   ml={1}
                   size="sm"
+                  borderRadius={7}
                   colorScheme="red"
                   aria-label="Cancelar edições"
                   onClick={() => cancelEdit(group.id)}
@@ -266,6 +268,7 @@ const Groups = () => {
                 <IconButton
                   size="sm"
                   colorScheme="orange"
+                  borderRadius={7}
                   aria-label="Editar fornecedor"
                   onClick={() => handleEdit(group.id)}
                   icon={<FiEdit />}
@@ -274,6 +277,7 @@ const Groups = () => {
                   ml={1}
                   size="sm"
                   colorScheme="red"
+                  borderRadius={7}
                   aria-label="Apagar fornecedor"
                   onClick={() => handleDelete(group.id)}
                   icon={<FiTrash2 />}

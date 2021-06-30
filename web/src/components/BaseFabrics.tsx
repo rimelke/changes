@@ -175,6 +175,7 @@ const BaseFabrics: FC<Params> = ({ baseFabrics, setBaseFabrics }) => {
               <Flex w="68px">
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="green"
                   aria-label="Salvar edições"
                   type="submit"
@@ -183,6 +184,7 @@ const BaseFabrics: FC<Params> = ({ baseFabrics, setBaseFabrics }) => {
                 <IconButton
                   ml={1}
                   size="sm"
+                  borderRadius={7}
                   colorScheme="red"
                   aria-label="Cancelar edições"
                   onClick={() => cancelEditFabric(baseFabric.orderId)}
@@ -223,6 +225,7 @@ const BaseFabrics: FC<Params> = ({ baseFabrics, setBaseFabrics }) => {
               <Flex w="68px">
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="orange"
                   aria-label="Editar custo"
                   onClick={() => handleEditFabric(baseFabric.orderId)}
@@ -231,6 +234,7 @@ const BaseFabrics: FC<Params> = ({ baseFabrics, setBaseFabrics }) => {
                 <IconButton
                   ml={1}
                   size="sm"
+                  borderRadius={7}
                   colorScheme="red"
                   aria-label="Apagar custo"
                   onClick={() => handleDeleteFabric(baseFabric.orderId)}

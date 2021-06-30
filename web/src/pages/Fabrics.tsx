@@ -266,6 +266,7 @@ const Fabrics = () => {
               <Flex>
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="green"
                   aria-label="Salvar edições"
                   type="submit"
@@ -274,6 +275,7 @@ const Fabrics = () => {
                 <IconButton
                   ml={1}
                   size="sm"
+                  borderRadius={7}
                   colorScheme="red"
                   aria-label="Cancelar edições"
                   onClick={() => cancelEdit(fabric.id)}
@@ -311,6 +313,7 @@ const Fabrics = () => {
                 <IconButton
                   size="sm"
                   colorScheme="orange"
+                  borderRadius={7}
                   aria-label="Editar tecido"
                   onClick={() => handleEdit(fabric.id)}
                   icon={<FiEdit />}
@@ -319,6 +322,7 @@ const Fabrics = () => {
                   ml={1}
                   size="sm"
                   colorScheme="red"
+                  borderRadius={7}
                   aria-label="Apagar tecido"
                   onClick={() => handleDelete(fabric.id)}
                   icon={<FiTrash2 />}

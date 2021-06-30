@@ -382,12 +382,14 @@ const Drafts = () => {
                       size="xs"
                       variant="outline"
                       colorScheme="teal"
+                      borderRadius={7}
                       onClick={newChangeOnOpen}
                       aria-label="Adicionar modificação"
                       icon={<FiPlus size={22} />}
                     />
                     <IconButton
                       size="xs"
+                      borderRadius={7}
                       variant="outline"
                       colorScheme="orange"
                       onClick={editDraftOnOpen}

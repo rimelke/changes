@@ -111,6 +111,7 @@ const BaseCosts: FC<Props> = ({ baseCosts, setBaseCosts }) => {
               <Flex>
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="green"
                   aria-label="Salvar edições"
                   type="submit"
@@ -119,6 +120,7 @@ const BaseCosts: FC<Props> = ({ baseCosts, setBaseCosts }) => {
                 <IconButton
                   ml={1}
                   size="sm"
+                  borderRadius={7}
                   colorScheme="red"
                   aria-label="Cancelar edições"
                   onClick={() => cancelEditCost(baseCost.orderId)}
@@ -138,6 +140,7 @@ const BaseCosts: FC<Props> = ({ baseCosts, setBaseCosts }) => {
               <Flex w="68px">
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="orange"
                   aria-label="Editar custo"
                   onClick={() => handleEditCost(baseCost.orderId)}
@@ -146,6 +149,7 @@ const BaseCosts: FC<Props> = ({ baseCosts, setBaseCosts }) => {
                 <IconButton
                   ml={1}
                   size="sm"
+                  borderRadius={7}
                   colorScheme="red"
                   aria-label="Apagar custo"
                   onClick={() => handleDeleteCost(baseCost.orderId)}

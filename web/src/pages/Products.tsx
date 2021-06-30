@@ -219,6 +219,7 @@ const Products = () => {
               <Flex w="68px">
                 <IconButton
                   size="sm"
+                  borderRadius={7}
                   colorScheme="orange"
                   aria-label="Editar tecido"
                   onClick={() => history.push(`/products/${product.id}`)}
@@ -226,6 +227,7 @@ const Products = () => {
                 />
                 <IconButton
                   ml={1}
+                  borderRadius={7}
                   size="sm"
                   colorScheme="red"
                   aria-label="Apagar tecido"

@@ -135,6 +135,7 @@ const EditProduct = () => {
             <IconButton
               ml={2}
               size="md"
+              borderRadius={7}
               colorScheme="red"
               aria-label="Cancelar edições"
               onClick={() => history.replace('/products')}
