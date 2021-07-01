@@ -230,13 +230,19 @@ const Products = () => {
                     {!viewProductDetails ? (
                       <>
                         <Tr>
-                          <Skeleton as={Td}>A</Skeleton>
+                          <Skeleton colspan={2} as={Td}>
+                            A
+                          </Skeleton>
                         </Tr>
                         <Tr>
-                          <Skeleton as={Td}>A</Skeleton>
+                          <Skeleton colspan={2} as={Td}>
+                            A
+                          </Skeleton>
                         </Tr>
                         <Tr>
-                          <Skeleton as={Td}>A</Skeleton>
+                          <Skeleton colspan={2} as={Td}>
+                            A
+                          </Skeleton>
                         </Tr>
                       </>
                     ) : (
@@ -274,13 +280,19 @@ const Products = () => {
                   {!viewProductDetails ? (
                     <>
                       <Tr>
-                        <Skeleton as={Td}>A</Skeleton>
+                        <Skeleton colspan={5} as={Td}>
+                          A
+                        </Skeleton>
                       </Tr>
                       <Tr>
-                        <Skeleton as={Td}>A</Skeleton>
+                        <Skeleton colspan={5} as={Td}>
+                          A
+                        </Skeleton>
                       </Tr>
                       <Tr>
-                        <Skeleton as={Td}>A</Skeleton>
+                        <Skeleton colspan={5} as={Td}>
+                          A
+                        </Skeleton>
                       </Tr>
                     </>
                   ) : (
