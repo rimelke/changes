@@ -17,10 +17,17 @@ import {
   Tbody,
   Tr,
   Th,
-  Td
+  Td,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  useDisclosure
 } from '@chakra-ui/react'
 import withSidebar from '../hooks/withSidebar'
-import { FiEdit, FiTrash2 } from 'react-icons/fi'
+import { FiEdit, FiTrash2, FiEye } from 'react-icons/fi'
 import { useGet } from '../hooks/useGet'
 import { Link, useHistory } from 'react-router-dom'
 import api from '../services/api'
@@ -30,6 +37,7 @@ import IGroup from '../types/IGroup'
 import getProducts from '../hooks/getProducts'
 import { Input } from '../components/Form'
 import { Form } from '@unform/web'
+import IDetailedProduct from '../types/IDetailedProduct'
 
 const Products = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
@@ -48,6 +56,18 @@ const Products = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const [deletingProduct, setDeletingProduct] = useState<IProduct | null>(null)
+
+  const {
+    isOpen: viewProductIsOpen,
+    onClose: viewProcutsOnClose,
+    onOpen: viewProductOnOpen
+  } = useDisclosure()
+  const [viewProduct, setViewProduct] = useState<IProduct | null>(null)
+  const { data: viewProductDetails } = useGet<IDetailedProduct>(
+    `/products/${viewProduct?.id || null}`
+  )
+
+  console.log(viewProductDetails)
 
   function onClose() {
     setIsOpen(false)
@@ -112,6 +132,189 @@ const Products = () => {
         />
       </Flex>
 
+      {viewProduct && (
+        <Modal
+          size="4xl"
+          isOpen={viewProductIsOpen}
+          onClose={viewProcutsOnClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              {viewProduct.ref} - {viewProduct.name}
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <Flex alignItems="flex-start" gridGap={8}>
+                <Flex flex={1} flexDir="column">
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Coleção:</Text>
+                    <Text color="gray.700">{viewProduct.group.name}</Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Referência:</Text>
+                    <Text color="gray.700">{viewProduct.ref}</Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Nome:</Text>
+                    <Text color="gray.700">{viewProduct.name}</Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Custo:</Text>
+                    <Text color="gray.700">
+                      {viewProduct.cost.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Preço:</Text>
+                    <Text color="gray.700">
+                      {viewProduct.price?.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Lucro:</Text>
+                    <Text color="gray.700">
+                      {viewProduct.profit
+                        ? viewProduct.profit?.toLocaleString('pt-br', {
+                            maximumFractionDigits: 1,
+                            minimumFractionDigits: 1
+                          }) + ' %'
+                        : '-'}
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Criado em:</Text>
+                    <Text color="gray.700">
+                      {new Date(viewProduct.createdAt).toLocaleString('pt-br', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between">
+                    <Text color="gray.600">Últ. Modificação:</Text>
+                    <Text color="gray.700">
+                      {new Date(viewProduct.updatedAt).toLocaleString('pt-br', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </Text>
+                  </Flex>
+                </Flex>
+                <Table flex={1} borderWidth="1px">
+                  <Thead>
+                    <Tr bg="gray.50">
+                      <Th textAlign="center" colSpan={2}>
+                        Custos
+                      </Th>
+                    </Tr>
+                    <Tr>
+                      <Th py={2}>Nome</Th>
+                      <Th py={2} isNumeric>
+                        Valor
+                      </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {!viewProductDetails ? (
+                      <>
+                        <Tr>
+                          <Skeleton as={Td}>A</Skeleton>
+                        </Tr>
+                        <Tr>
+                          <Skeleton as={Td}>A</Skeleton>
+                        </Tr>
+                        <Tr>
+                          <Skeleton as={Td}>A</Skeleton>
+                        </Tr>
+                      </>
+                    ) : (
+                      viewProductDetails.costs.map((cost) => (
+                        <Tr key={cost.id}>
+                          <Td py={2}>{cost.name}</Td>
+                          <Td py={2} isNumeric>
+                            {cost.value.toLocaleString('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL'
+                            })}
+                          </Td>
+                        </Tr>
+                      ))
+                    )}
+                  </Tbody>
+                </Table>
+              </Flex>
+              <Table borderWidth="1px" mt={8}>
+                <Thead>
+                  <Tr bg="gray.50">
+                    <Th colSpan={5} textAlign="center">
+                      Tecidos
+                    </Th>
+                  </Tr>
+                  <Tr>
+                    <Th>Fornecedor</Th>
+                    <Th>Nome</Th>
+                    <Th isNumeric>Preço</Th>
+                    <Th isNumeric>Rendimento</Th>
+                    <Th isNumeric>Subtotal</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {!viewProductDetails ? (
+                    <>
+                      <Tr>
+                        <Skeleton as={Td}>A</Skeleton>
+                      </Tr>
+                      <Tr>
+                        <Skeleton as={Td}>A</Skeleton>
+                      </Tr>
+                      <Tr>
+                        <Skeleton as={Td}>A</Skeleton>
+                      </Tr>
+                    </>
+                  ) : (
+                    viewProductDetails.fabrics.map((fabric) => (
+                      <Tr key={fabric.id}>
+                        <Td py={2}>{fabric.fabric.provider.name}</Td>
+                        <Td py={2}>{fabric.fabric.name}</Td>
+                        <Td py={2} isNumeric>
+                          {fabric.finalPrice.toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                          })}
+                        </Td>
+                        <Td py={2} isNumeric>
+                          {fabric.efficiency.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 3
+                          })}
+                        </Td>
+                        <Td py={2} isNumeric>
+                          {fabric.subtotal.toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                          })}
+                        </Td>
+                      </Tr>
+                    ))
+                  )}
+                </Tbody>
+              </Table>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
+
       <AlertDialog
         leastDestructiveRef={cancelRef}
         onClose={onClose}
@@ -159,7 +362,6 @@ const Products = () => {
         <Tbody>
           {!products ? (
             <>
-              {' '}
               <Tr>
                 <Skeleton colspan={7} as={Td}>
                   A
@@ -214,15 +416,27 @@ const Products = () => {
                   <IconButton
                     size="sm"
                     borderRadius={7}
+                    colorScheme="blue"
+                    aria-label="Visualizar produto"
+                    onClick={() => {
+                      setViewProduct(product)
+                      viewProductOnOpen()
+                    }}
+                    icon={<FiEye />}
+                  />
+                  <IconButton
+                    size="sm"
+                    ml={1}
+                    borderRadius={7}
                     colorScheme="orange"
                     aria-label="Editar produto"
                     onClick={() => history.push(`/products/${product.id}`)}
                     icon={<FiEdit />}
                   />
                   <IconButton
-                    ml={1}
                     borderRadius={7}
                     size="sm"
+                    ml={1}
                     colorScheme="red"
                     aria-label="Apagar produto"
                     onClick={() => handleDelete(product)}
