@@ -105,15 +105,16 @@ const Products = () => {
         Produtos
       </Heading>
 
-      <Flex mt={4}>
+      <Flex
+        as={Form}
+        onSubmit={(data: any) => handleSearch(data)}
+        mt={4}
+        gridGap={4}>
         <Button colorScheme="teal" to="/products/new" as={Link}>
           Novo
         </Button>
-      </Flex>
-
-      <Flex as={Form} onSubmit={(data: any) => handleSearch(data)} mt={4}>
         <Select
-          flex={1}
+          width="max-content"
           onChange={(e) =>
             setSelectedGroupId(e.target.value === '' ? null : e.target.value)
           }
@@ -125,10 +126,9 @@ const Products = () => {
           ))}
         </Select>
         <Input
+          width="max-content"
           name="search"
           placeholder="Digite para pesquisar"
-          flex={3}
-          ml={4}
         />
       </Flex>
 
