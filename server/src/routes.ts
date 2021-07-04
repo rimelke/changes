@@ -7,6 +7,7 @@ import GroupsController from './controllers/GroupsController'
 import ProductsController from './controllers/ProductsController'
 import ProvidersController from './controllers/ProvidersController'
 import BudgetsController from './controllers/BudgetsController'
+import NeedlewomansController from './controllers/NeedlewomansController'
 
 const groupsController = new GroupsController()
 const providersController = new ProvidersController()
@@ -16,6 +17,7 @@ const draftsController = new DraftsController()
 const changesController = new ChangesController()
 const categoriesController = new CategoriesController()
 const budgetsController = new BudgetsController()
+const needlewomansController = new NeedlewomansController()
 
 const routes = Router()
 
@@ -58,5 +60,7 @@ routes.get('/budgets', budgetsController.index)
 routes.post('/budgets', budgetsController.create)
 routes.put('/budgets/:id', budgetsController.update)
 routes.delete('/budgets/:id', budgetsController.delete)
+
+routes.get('/needlewomans', needlewomansController.index)
 
 export default routes
