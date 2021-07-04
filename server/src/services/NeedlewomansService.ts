@@ -6,6 +6,10 @@ interface ICreateNeedlewomanData {
   name: string
 }
 
+interface IUpdateNeedlewomanData {
+  name?: string
+}
+
 class NeedlewomansService {
   private needlewomansRepository: NeedlewomansRepository
 
@@ -27,6 +31,18 @@ class NeedlewomansService {
     const needlewoman = this.needlewomansRepository.create(value)
 
     await this.needlewomansRepository.save(needlewoman)
+  }
+
+  async updateNeedlewoman(id: string, data: IUpdateNeedlewomanData) {
+    const schema = Joi.object<IUpdateNeedlewomanData>()
+      .keys({
+        name: Joi.string()
+      })
+      .min(1)
+
+    const value: IUpdateNeedlewomanData = await schema.validateAsync(data)
+
+    await this.needlewomansRepository.update({ id }, value)
   }
 }
 

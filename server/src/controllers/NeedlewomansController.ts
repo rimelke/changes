@@ -17,6 +17,16 @@ class NeedlewomansController {
 
     res.status(201).send()
   }
+
+  async update(req: Request, res: Response) {
+    const { id } = req.params
+
+    const needlewomansService = new NeedlewomansService()
+
+    await needlewomansService.updateNeedlewoman(id, req.body)
+
+    res.send()
+  }
 }
 
 export default NeedlewomansController

@@ -63,5 +63,6 @@ routes.delete('/budgets/:id', budgetsController.delete)
 
 routes.get('/needlewomans', needlewomansController.index)
 routes.post('/needlewomans', needlewomansController.create)
+routes.put('/needlewomans/:id', needlewomansController.update)
 
 export default routes
