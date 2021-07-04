@@ -17,9 +17,6 @@ class ProvidersRepository extends Repository<Provider> {
 
     const fabricsIds = await fabricsRepository.updateFinalPrices(providerId)
 
-    console.log(2)
-    console.log(fabricsIds)
-
     const productsIds = [
       ...new Set(
         (

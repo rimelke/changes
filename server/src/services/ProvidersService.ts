@@ -43,7 +43,7 @@ class ProvidersService {
 
     await this.providersRepository.update({ id }, value)
 
-    if (value.tax) {
+    if (value.tax !== undefined) {
       this.providersRepository.cascadeUpdates(id)
     }
   }

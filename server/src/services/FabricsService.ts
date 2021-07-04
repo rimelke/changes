@@ -61,7 +61,7 @@ class FabricsService {
 
     await this.fabricsRepository.update({ id }, value)
 
-    if (value.providerId || value.price) {
+    if (value.providerId || value.price !== undefined) {
       const fabric = await this.fabricsRepository.findOne(id, {
         relations: ['provider']
       })
