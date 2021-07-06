@@ -8,7 +8,8 @@ import {
   FiBriefcase,
   FiPenTool,
   FiGrid,
-  FiDollarSign
+  FiDollarSign,
+  FiArchive
 } from 'react-icons/fi'
 
 const items = [
@@ -24,7 +25,8 @@ const items = [
   { name: 'Fornecedores', icon: FiTruck, path: '/providers' },
   { name: 'Rascunhos', icon: FiPenTool, path: '/drafts' },
   { name: 'Categorias', icon: FiGrid, path: '/categories' },
-  { name: 'Orçamento', icon: FiDollarSign, path: '/budgets' }
+  { name: 'Orçamento', icon: FiDollarSign, path: '/budgets' },
+  { name: 'Serviços', icon: FiArchive, path: '/services' }
 ]
 
 const Sidebar = () => {

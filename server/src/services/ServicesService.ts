@@ -35,7 +35,11 @@ class ServicesService {
   }
 
   getServices() {
-    return this.servicesRepository.find()
+    return this.servicesRepository.find({
+      relations: ['needlewoman'],
+      take: 30,
+      order: { incrementId: 'DESC' }
+    })
   }
 
   getServiceById(id: string) {
