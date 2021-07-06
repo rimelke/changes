@@ -35,10 +35,10 @@ class Service {
   @Column()
   amount: number
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'date' })
   deliveryDate?: string
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'date' })
   withdrawalDate?: string
 
   @Column({ nullable: true })
@@ -53,7 +53,9 @@ class Service {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @OneToMany(() => ServiceProduct, (serviceProduct) => serviceProduct.service)
+  @OneToMany(() => ServiceProduct, (serviceProduct) => serviceProduct.service, {
+    cascade: true
+  })
   products: ServiceProduct[]
 
   constructor(props: Omit<Service, 'id' | 'createdAt' | 'updatedAt'>) {
