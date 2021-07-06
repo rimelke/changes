@@ -68,6 +68,7 @@ routes.post('/needlewomans', needlewomansController.create)
 routes.put('/needlewomans/:id', needlewomansController.update)
 
 routes.get('/services', servicesController.index)
+routes.get('/services/:id', servicesController.show)
 routes.post('/services', servicesController.create)
 
 export default routes

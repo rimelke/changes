@@ -38,6 +38,12 @@ class ServicesService {
     return this.servicesRepository.find()
   }
 
+  getServiceById(id: string) {
+    return this.servicesRepository.findOne(id, {
+      relations: ['products', 'products.product', 'needlewoman']
+    })
+  }
+
   async createService(data: ICreateServiceData) {
     const schema = Joi.object<ICreateServiceData>().keys({
       needlewomanId: Joi.string().required(),
@@ -108,8 +114,6 @@ class ServicesService {
       value: productsValue,
       products
     })
-
-    console.log(service)
 
     if (value.withdrawalDate) {
       service.duration = Math.ceil(

@@ -7,9 +7,17 @@ class ServicesController {
 
     const services = await servicesService.getServices()
 
-    console.log(services[2])
-
     res.json(services)
+  }
+
+  async show(req: Request, res: Response) {
+    const { id } = req.params
+
+    const servicesService = new ServicesService()
+
+    const service = await servicesService.getServiceById(id)
+
+    res.json(service)
   }
 
   async create(req: Request, res: Response) {
