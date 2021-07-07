@@ -18,7 +18,9 @@ import {
   Button,
   FormControl,
   FormLabel,
-  useToast
+  useToast,
+  IconButton,
+  Text
 } from '@chakra-ui/react'
 import { Form } from '@unform/web'
 import { useState, FC } from 'react'
@@ -35,6 +37,8 @@ import withSidebar from '../hooks/withSidebar'
 import api from '../services/api'
 import INeedlewoman from '../types/INeedlewoman'
 import IService from '../types/IService'
+import { FiEye } from 'react-icons/fi'
+import IDetailedService from '../types/IDetailedService'
 
 interface ICreateServiceModalProps {
   isOpen: boolean
@@ -47,6 +51,12 @@ interface IServiceProduct {
   name: string
   ref: string
   amount: number
+}
+
+interface IViewServiceModalProps {
+  viewService: IService | null
+  isOpen: boolean
+  onClose: () => void
 }
 
 const CreateServiceModal: FC<ICreateServiceModalProps> = ({
@@ -249,14 +259,158 @@ const CreateServiceModal: FC<ICreateServiceModalProps> = ({
   )
 }
 
+const ViewServiceModal: FC<IViewServiceModalProps> = ({
+  viewService,
+  isOpen,
+  onClose
+}) => {
+  const { data } = useGet<IDetailedService>(
+    `/services/${viewService?.id || null}`
+  )
+
+  console.log(data)
+  const BasicInfo: FC<{
+    label: string
+    value: any
+  }> = ({ label, value }) => (
+    <Flex justifyContent="space-between">
+      <Text>{label}</Text>
+      <Text>{value}</Text>
+    </Flex>
+  )
+
+  return (
+    <Modal size="6xl" isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          Visualizar serviço - #{viewService?.incrementId}
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6} gridGap={8} display="flex">
+          <Flex w="md" gridGap={1} flexDir="column">
+            <BasicInfo label="ID" value={'#' + viewService?.incrementId} />
+            <BasicInfo
+              label="Costureira"
+              value={viewService?.needlewoman.name}
+            />
+            <BasicInfo label="QTD Total" value={viewService?.amount} />
+
+            <BasicInfo
+              label="Valor total"
+              value={viewService?.value.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+              })}
+            />
+            <BasicInfo
+              label="Entrega"
+              value={
+                viewService?.deliveryDate &&
+                new Date(
+                  viewService.deliveryDate + ' 00:00'
+                ).toLocaleDateString('pt-br')
+              }
+            />
+            <BasicInfo
+              label="Retirada"
+              value={
+                viewService?.withdrawalDate &&
+                new Date(
+                  viewService.withdrawalDate + ' 00:00'
+                ).toLocaleDateString('pt-br')
+              }
+            />
+            <BasicInfo
+              label="Pago"
+              value={viewService?.isPayed ? 'SIM' : 'NÃO'}
+            />
+            <BasicInfo
+              label="Criado em"
+              value={
+                viewService?.createdAt &&
+                new Date(viewService.createdAt).toLocaleString('pt-br', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: 'numeric',
+                  minute: '2-digit'
+                })
+              }
+            />
+            <BasicInfo
+              label="Últ. Modificação"
+              value={
+                viewService?.updatedAt &&
+                new Date(viewService.updatedAt).toLocaleString('pt-br', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: 'numeric',
+                  minute: '2-digit'
+                })
+              }
+            />
+          </Flex>
+          <Table borderWidth="1px">
+            <Thead>
+              <Tr bg="gray.50">
+                <Th textAlign="center" colSpan={5}>
+                  Produtos
+                </Th>
+              </Tr>
+              <Tr>
+                <Th>Ref</Th>
+                <Th>Nome</Th>
+                <Th isNumeric>QTD</Th>
+                <Th isNumeric>Valor unit.</Th>
+                <Th isNumeric>Valor total</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {data &&
+                data.products.map((serviceProduct) => (
+                  <Tr key={serviceProduct.id}>
+                    <Td>{serviceProduct.product.ref}</Td>
+                    <Td>{serviceProduct.product.name}</Td>
+                    <Td isNumeric>{serviceProduct.amount}</Td>
+                    <Td isNumeric>
+                      {serviceProduct.unitValue.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </Td>
+                    <Td isNumeric>
+                      {serviceProduct.totalValue.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </Td>
+                  </Tr>
+                ))}
+            </Tbody>
+          </Table>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  )
+}
+
 const Services = () => {
   const { data: services, mutate: servicesMutate } =
     useGet<IService[]>('/services')
+
+  const [viewService, setViewService] = useState<IService | null>(null)
 
   const {
     isOpen: newServiceIsOpen,
     onClose: newServiceOnClose,
     onOpen: newServiceOnOpen
+  } = useDisclosure()
+  const {
+    isOpen: viewServiceIsOpen,
+    onClose: viewServiceOnClose,
+    onOpen: viewServiceOnOpen
   } = useDisclosure()
 
   return (
@@ -279,6 +433,12 @@ const Services = () => {
         />
       )}
 
+      <ViewServiceModal
+        isOpen={viewServiceIsOpen}
+        onClose={viewServiceOnClose}
+        viewService={viewService}
+      />
+
       <Table mt={4} borderWidth="1px">
         <Thead>
           <Tr>
@@ -290,6 +450,7 @@ const Services = () => {
             <Th textAlign="center">Retirada</Th>
             <Th textAlign="center">Pago</Th>
             <Th textAlign="center">Situação</Th>
+            <Th />
           </Tr>
         </Thead>
         <Tbody>
@@ -342,6 +503,19 @@ const Services = () => {
                   : !service.isPayed
                   ? 'Pagar'
                   : 'Concluído'}
+              </Td>
+              <Td isNumeric>
+                <IconButton
+                  aria-label="Visualizar serviço"
+                  size="sm"
+                  borderRadius={7}
+                  onClick={() => {
+                    setViewService(service)
+                    viewServiceOnOpen()
+                  }}
+                  colorScheme="blue"
+                  icon={<FiEye />}
+                />
               </Td>
             </Tr>
           ))}
