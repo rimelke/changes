@@ -2,7 +2,7 @@ import { useState } from 'react'
 import IProduct from '../types/IProduct'
 import { useGet } from './useGet'
 
-interface IGetProductsData {
+export interface IGetProductsData {
   total: number
   data: IProduct[]
 }

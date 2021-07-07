@@ -31,6 +31,8 @@ class NeedlewomansService {
     const needlewoman = this.needlewomansRepository.create(value)
 
     await this.needlewomansRepository.save(needlewoman)
+
+    return needlewoman
   }
 
   async updateNeedlewoman(id: string, data: IUpdateNeedlewomanData) {

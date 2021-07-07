@@ -13,9 +13,9 @@ class NeedlewomansController {
   async create(req: Request, res: Response) {
     const needlewomansService = new NeedlewomansService()
 
-    await needlewomansService.createNeedlewoman(req.body)
+    const needlewoman = await needlewomansService.createNeedlewoman(req.body)
 
-    res.status(201).send()
+    res.status(201).json(needlewoman)
   }
 
   async update(req: Request, res: Response) {
