@@ -27,6 +27,16 @@ class ServicesController {
 
     res.status(201).send()
   }
+
+  async update(req: Request, res: Response) {
+    const { id } = req.params
+
+    const servicesService = new ServicesService()
+
+    await servicesService.updateService(id, req.body)
+
+    res.send()
+  }
 }
 
 export default ServicesController

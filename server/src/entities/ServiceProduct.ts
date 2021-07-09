@@ -20,7 +20,7 @@ class ServiceProduct {
   serviceId: string
 
   @JoinColumn({ name: 'serviceId' })
-  @ManyToOne(() => Service)
+  @ManyToOne(() => Service, { orphanedRowAction: 'delete' })
   service: Service
 
   @Column()
