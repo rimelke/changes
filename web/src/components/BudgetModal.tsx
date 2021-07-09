@@ -13,6 +13,7 @@ import {
 import { Form } from '@unform/web'
 import { useState, FC } from 'react'
 import { useGet } from '../hooks/useGet'
+import IBudget from '../types/IBudget'
 import ICategory from '../types/ICategory'
 
 import { Select, Input, MaskInput } from './Form'
@@ -28,12 +29,18 @@ interface IBudgetModalProps {
   disclosure: UseDisclosureReturn
   onSubmit: (data: IBudgetData) => Promise<any>
   resolveCallback?: (data: any) => void
+  initialData?: IBudget
+  title: string
+  buttonLabel: string
 }
 
 const BudgetModal: FC<IBudgetModalProps> = ({
   disclosure,
   onSubmit,
-  resolveCallback = () => {}
+  resolveCallback = () => {},
+  initialData = {},
+  title,
+  buttonLabel
 }) => {
   const { data: categories } = useGet<ICategory[]>('/categories')
 
@@ -54,7 +61,6 @@ const BudgetModal: FC<IBudgetModalProps> = ({
         resolveCallback(value)
       })
       .catch(() => {
-        setIsLoading(false)
         toast({
           title: 'Um erro inesperado ocorreu!',
           description: 'Recarregue a página e tente novamente',
@@ -63,17 +69,21 @@ const BudgetModal: FC<IBudgetModalProps> = ({
           isClosable: true
         })
       })
+      .finally(() => setIsLoading(false))
   }
 
   return (
     <Modal isOpen={disclosure.isOpen} onClose={disclosure.onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Adicionar registro</ModalHeader>
+        <ModalHeader>{title}</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <Form onSubmit={handleSubmit}>
-            <Select isRequired name="categoryId">
+        <ModalBody pb={6}>
+          <Form initialData={initialData} onSubmit={handleSubmit}>
+            <Select
+              placeholder="Selecione uma categoria"
+              isRequired
+              name="categoryId">
               {categories?.map((category) => (
                 <option value={category.id} key={category.id}>
                   {category.name}
@@ -107,7 +117,7 @@ const BudgetModal: FC<IBudgetModalProps> = ({
                 Cancelar
               </Button>
               <Button isLoading={isLoading} type="submit" colorScheme="green">
-                Adicionar
+                {buttonLabel}
               </Button>
             </Flex>
           </Form>
