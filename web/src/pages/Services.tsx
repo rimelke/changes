@@ -145,7 +145,12 @@ const ServiceForm: FC<IServiceForm> = ({
       ref: string
     }
   }) {
-    if (data.product)
+    if (
+      data.product &&
+      !serviceProducts
+        .map((serviceProduct) => serviceProduct.productId)
+        .includes(data.product.value)
+    )
       setServiceProducts([
         ...serviceProducts,
         {
@@ -167,6 +172,14 @@ const ServiceForm: FC<IServiceForm> = ({
       name: product.name,
       ref: product.ref
     }))
+  }
+
+  function handleRemoveProduct(productId: string) {
+    setServiceProducts(
+      serviceProducts.filter(
+        (serviceProduct) => serviceProduct.productId !== productId
+      )
+    )
   }
 
   return (
@@ -212,10 +225,7 @@ const ServiceForm: FC<IServiceForm> = ({
         </Button>
       </Flex>
       <Flex flex={1} gridGap={4} flexDir="column">
-        <Form
-          ref={productsFormRef}
-          initialData={initialData}
-          onSubmit={() => {}}>
+        <Form ref={productsFormRef} onSubmit={() => {}}>
           <Table borderWidth="1px">
             <Thead>
               <Tr bg="gray.50">
@@ -246,6 +256,7 @@ const ServiceForm: FC<IServiceForm> = ({
                         thousandSeparator="."
                         decimalSeparator=","
                         autoComplete="off"
+                        defaultValue={serviceProduct.amount}
                         name="amount"
                         disabled={initialData?.isPayed}
                         placeholder="QTD"
@@ -267,6 +278,9 @@ const ServiceForm: FC<IServiceForm> = ({
                           size="sm"
                           colorScheme="red"
                           variant="ghost"
+                          onClick={() =>
+                            handleRemoveProduct(serviceProduct.productId)
+                          }
                           borderRadius={7}
                         />
                       </Td>
