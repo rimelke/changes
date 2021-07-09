@@ -2,7 +2,6 @@ import { useState, FC, useRef, useEffect } from 'react'
 import CSelect, { Props as CreatableSelectProps } from 'react-select/creatable'
 import { Flex } from '@chakra-ui/react'
 import { ControlProps, OptionTypeBase } from 'react-select'
-
 import { useField } from '@unform/core'
 
 interface Props extends CreatableSelectProps<OptionTypeBase, false> {
@@ -10,10 +9,12 @@ interface Props extends CreatableSelectProps<OptionTypeBase, false> {
   name: string
 }
 
-const CreatableSelect: FC<Props> = ({ name, onCreate, ...rest }) => {
-  const [value, setValue] = useState<OptionTypeBase | null>(null)
+const CreatableSelect: FC<Props> = ({ name, onCreate, options, ...rest }) => {
   const selectRef = useRef(null)
   const { defaultValue, fieldName, registerField } = useField(name)
+  const [value, setValue] = useState<OptionTypeBase | null>(
+    options?.find((opt) => opt.value === defaultValue) || null
+  )
 
   useEffect(() => {
     registerField({
@@ -44,7 +45,7 @@ const CreatableSelect: FC<Props> = ({ name, onCreate, ...rest }) => {
     <CSelect
       {...rest}
       ref={selectRef}
-      defaultValue={defaultValue}
+      options={options}
       onChange={(opt) => setValue(opt)}
       components={{ Control }}
       styles={{ placeholder: () => ({ color: 'black' }) }}
