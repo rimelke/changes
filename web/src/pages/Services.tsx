@@ -46,6 +46,8 @@ interface ICreateServiceModalProps {
   isOpen: boolean
   onClose: () => void
   servicesMutate: () => Promise<any>
+  needlewomans: INeedlewoman[] | undefined
+  needlewomansMutate: () => Promise<any>
 }
 
 interface IServiceProduct {
@@ -67,6 +69,8 @@ interface IUpdateServiceModal {
   isOpen: boolean
   onClose: () => void
   servicesMutate: () => Promise<any>
+  needlewomans: INeedlewoman[] | undefined
+  needlewomansMutate: () => Promise<any>
 }
 
 interface IServiceData {
@@ -83,6 +87,8 @@ interface IServiceForm {
   servicesMutate: () => Promise<any>
   onClose: () => void
   buttonTitle: string
+  needlewomans: INeedlewoman[] | undefined
+  needlewomansMutate: () => Promise<any>
 }
 
 const ServiceForm: FC<IServiceForm> = ({
@@ -90,11 +96,10 @@ const ServiceForm: FC<IServiceForm> = ({
   initialData,
   servicesMutate,
   onClose,
-  buttonTitle
+  buttonTitle,
+  needlewomansMutate,
+  needlewomans
 }) => {
-  const { data: needlewomans, mutate: needlewomansMutate } =
-    useGet<INeedlewoman[]>('/needlewomans')
-
   const [isLoading, setIsLoading] = useState(false)
   const [serviceProducts, setServiceProducts] = useState<IServiceProduct[]>(
     initialData?.products || []
@@ -320,7 +325,9 @@ const ServiceForm: FC<IServiceForm> = ({
 const CreateServiceModal: FC<ICreateServiceModalProps> = ({
   isOpen,
   onClose,
-  servicesMutate
+  servicesMutate,
+  needlewomans,
+  needlewomansMutate
 }) => {
   return (
     <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
@@ -331,6 +338,8 @@ const CreateServiceModal: FC<ICreateServiceModalProps> = ({
         <ModalBody pb={6}>
           <ServiceForm
             onClose={onClose}
+            needlewomans={needlewomans}
+            needlewomansMutate={needlewomansMutate}
             onSubmit={(data) => api.post('/services', data)}
             servicesMutate={servicesMutate}
             buttonTitle="Adicionar serviço"
@@ -481,7 +490,9 @@ const UpdateServiceModal: FC<IUpdateServiceModal> = ({
   isOpen,
   onClose,
   updateService,
-  servicesMutate
+  servicesMutate,
+  needlewomans,
+  needlewomansMutate
 }) => {
   const [data, setData] = useState<IDetailedService | null>(null)
 
@@ -503,6 +514,8 @@ const UpdateServiceModal: FC<IUpdateServiceModal> = ({
         <ModalBody pb={6}>
           {data ? (
             <ServiceForm
+              needlewomans={needlewomans}
+              needlewomansMutate={needlewomansMutate}
               servicesMutate={servicesMutate}
               onClose={onClose}
               onSubmit={(data) =>
@@ -527,6 +540,8 @@ const UpdateServiceModal: FC<IUpdateServiceModal> = ({
 const Services = () => {
   const { data: services, mutate: servicesMutate } =
     useGet<IService[]>('/services')
+  const { data: needlewomans, mutate: needlewomansMutate } =
+    useGet<INeedlewoman[]>('/needlewomans')
 
   const [viewService, setViewService] = useState<IService | null>(null)
   const [updateService, setUpdateService] = useState<IService | null>(null)
@@ -561,6 +576,8 @@ const Services = () => {
 
       {newServiceIsOpen && (
         <CreateServiceModal
+          needlewomans={needlewomans}
+          needlewomansMutate={needlewomansMutate}
           servicesMutate={servicesMutate}
           isOpen={newServiceIsOpen}
           onClose={newServiceOnClose}
@@ -569,6 +586,8 @@ const Services = () => {
 
       {updateServiceIsOpen && (
         <UpdateServiceModal
+          needlewomans={needlewomans}
+          needlewomansMutate={needlewomansMutate}
           isOpen={updateServiceIsOpen}
           onClose={updateServiceOnClose}
           updateService={updateService}
