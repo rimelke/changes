@@ -72,5 +72,6 @@ routes.get('/services/:id', servicesController.show)
 routes.post('/services', servicesController.create)
 routes.put('/services/pay/:id', servicesController.pay)
 routes.put('/services/:id', servicesController.update)
+routes.delete('/services/:id', servicesController.delete)
 
 export default routes

@@ -274,6 +274,14 @@ class ServicesService {
 
     await this.servicesRepository.update({ id }, { isPayed: true, budgetId })
   }
+
+  async deleteService(id: string) {
+    const service = await this.servicesRepository.findOne(id)
+
+    if (service.isPayed) throw new AppError('Cannot delete a payed service.')
+
+    await this.servicesRepository.delete({ id })
+  }
 }
 
 export default ServicesService

@@ -47,6 +47,16 @@ class ServicesController {
 
     res.send()
   }
+
+  async delete(req: Request, res: Response) {
+    const { id } = req.params
+
+    const servicesService = new ServicesService()
+
+    await servicesService.deleteService(id)
+
+    res.send()
+  }
 }
 
 export default ServicesController
