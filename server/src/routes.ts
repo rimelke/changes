@@ -47,6 +47,7 @@ routes.delete('/products/:id', productsController.delete)
 routes.get('/drafts', draftsController.index)
 routes.get('/drafts/:id', draftsController.show)
 routes.post('/drafts', draftsController.create)
+routes.put('/drafts/promote/:id', draftsController.promote)
 routes.put('/drafts/:id', draftsController.update)
 routes.delete('/drafts/:id', draftsController.delete)
 

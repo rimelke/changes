@@ -38,6 +38,16 @@ class DraftsController {
     res.send()
   }
 
+  async promote(req: Request, res: Response) {
+    const { id } = req.params
+
+    const draftsService = new DraftsService()
+
+    await draftsService.promoteDraft(id, req.body)
+
+    res.send()
+  }
+
   async delete(req: Request, res: Response) {
     const { id } = req.params
 

@@ -3,6 +3,7 @@ import { getCustomRepository } from 'typeorm'
 import AppError from '../errors/AppError'
 import DraftsRepository from '../repositories/DraftsRepository'
 import GroupsRepository from '../repositories/GroupsRepository'
+import ProductsService, { ICreateProductData } from './ProductsService'
 
 interface IGetDraftsParams {
   type?: string
@@ -21,9 +22,13 @@ class DraftsService {
   private draftsRepository: DraftsRepository
   private groupsRepository: GroupsRepository
 
+  private productsService: ProductsService
+
   constructor() {
     this.draftsRepository = getCustomRepository(DraftsRepository)
     this.groupsRepository = getCustomRepository(GroupsRepository)
+
+    this.productsService = new ProductsService()
   }
 
   async getDrafts(data: IGetDraftsParams) {
@@ -105,6 +110,12 @@ class DraftsService {
     const value = await schema.validateAsync(data)
 
     await this.draftsRepository.update({ id }, value)
+  }
+
+  async promoteDraft(id: string, data: ICreateProductData) {
+    await this.productsService.createProduct(data, id)
+
+    await this.draftsRepository.delete({ id })
   }
 
   async deleteDraft(id: string) {

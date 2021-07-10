@@ -5,6 +5,21 @@ import FabricsRepository from '../repositories/FabricsRepository'
 import GroupsRepository from '../repositories/GroupsRepository'
 import ProductsRepository from '../repositories/ProductsRepository'
 
+export interface ICreateProductData {
+  ref: string
+  groupId: string
+  name: string
+  price?: number
+  costs?: {
+    name: string
+    value: number
+  }[]
+  fabrics?: {
+    fabricId: string
+    efficiency: number
+  }[]
+}
+
 class ProductsService {
   private productsRepository: ProductsRepository
   private groupsRepository: GroupsRepository
@@ -58,8 +73,8 @@ class ProductsService {
     })
   }
 
-  async createProduct(data: any) {
-    const schema = Joi.object().keys({
+  async createProduct(data: ICreateProductData, id?: string) {
+    const schema = Joi.object<ICreateProductData>().keys({
       ref: Joi.string().uppercase().required(),
       groupId: Joi.string().required(),
       name: Joi.string().required(),
@@ -82,7 +97,7 @@ class ProductsService {
         .default([])
     })
 
-    const value = await schema.validateAsync(data)
+    const value: ICreateProductData = await schema.validateAsync(data)
 
     const refIsUsed = await this.productsRepository.findOne({ ref: value.ref })
 
@@ -130,7 +145,8 @@ class ProductsService {
       ...value,
       fabrics,
       cost,
-      profit
+      profit,
+      id
     })
 
     await this.productsRepository.save(product)
