@@ -40,6 +40,12 @@ class Budget {
   })
   category: Category
 
+  @Column({ nullable: true })
+  referenceId: string
+
+  @Column({ nullable: true })
+  referenceType: string
+
   constructor(props: Omit<Budget, 'id' | 'createdAt' | 'updatedAt'>) {
     Object.assign(this, props)
     this.id = genId()

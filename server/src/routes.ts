@@ -7,6 +7,8 @@ import GroupsController from './controllers/GroupsController'
 import ProductsController from './controllers/ProductsController'
 import ProvidersController from './controllers/ProvidersController'
 import BudgetsController from './controllers/BudgetsController'
+import NeedlewomansController from './controllers/NeedlewomansController'
+import ServicesController from './controllers/ServicesController'
 
 const groupsController = new GroupsController()
 const providersController = new ProvidersController()
@@ -16,6 +18,8 @@ const draftsController = new DraftsController()
 const changesController = new ChangesController()
 const categoriesController = new CategoriesController()
 const budgetsController = new BudgetsController()
+const needlewomansController = new NeedlewomansController()
+const servicesController = new ServicesController()
 
 const routes = Router()
 
@@ -58,5 +62,16 @@ routes.get('/budgets', budgetsController.index)
 routes.post('/budgets', budgetsController.create)
 routes.put('/budgets/:id', budgetsController.update)
 routes.delete('/budgets/:id', budgetsController.delete)
+
+routes.get('/needlewomans', needlewomansController.index)
+routes.post('/needlewomans', needlewomansController.create)
+routes.put('/needlewomans/:id', needlewomansController.update)
+
+routes.get('/services', servicesController.index)
+routes.get('/services/:id', servicesController.show)
+routes.post('/services', servicesController.create)
+routes.put('/services/pay/:id', servicesController.pay)
+routes.put('/services/:id', servicesController.update)
+routes.delete('/services/:id', servicesController.delete)
 
 export default routes

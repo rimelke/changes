@@ -11,18 +11,22 @@ interface IGetBudgetsParams {
   categoryId?: string
 }
 
+export type BudgetReferenceTypes = 'service'
+
 interface ICreateBudgetData {
   categoryId: string
   description: string
   value: number
-  date: Date
+  date: string
+  referenceId?: string
+  referenceType?: BudgetReferenceTypes
 }
 
 interface IUpdateBudgetData {
   categoryId?: string
   description?: string
   value?: number
-  date?: Date | string
+  date?: string
 }
 
 class BudgetsService {
@@ -62,11 +66,17 @@ class BudgetsService {
   }
 
   async createBudget(data: ICreateBudgetData) {
-    const schema = Joi.object().keys({
+    const schema = Joi.object<ICreateBudgetData>().keys({
       categoryId: Joi.string().required(),
       description: Joi.string().required(),
       value: Joi.number().positive().precision(2).required(),
-      date: Joi.date().required()
+      date: Joi.date().iso().raw().required(),
+      referenceId: Joi.string(),
+      referenceType: Joi.when('referenceId', {
+        not: null,
+        then: Joi.string().required(),
+        otherwise: Joi.forbidden()
+      })
     })
 
     const value: ICreateBudgetData = await schema.validateAsync(data)
@@ -77,12 +87,11 @@ class BudgetsService {
 
     if (!categoryExists) throw new AppError('Invalid categoryId.')
 
-    const budget = this.budgetsRepository.create({
-      ...value,
-      date: value.date.toISOString().split('T')[0]
-    })
+    const budget = this.budgetsRepository.create(value)
 
     await this.budgetsRepository.save(budget)
+
+    return budget
   }
 
   async updateBudget(id: string, data: IUpdateBudgetData) {
@@ -91,7 +100,7 @@ class BudgetsService {
         categoryId: Joi.string(),
         description: Joi.string(),
         value: Joi.number().positive().precision(2),
-        date: Joi.date()
+        date: Joi.date().iso().raw()
       })
       .min(1)
 
@@ -103,10 +112,6 @@ class BudgetsService {
       )
 
       if (!categoryExists) throw new AppError('Invalid categoryId.')
-    }
-
-    if (value.date) {
-      value.date = new Date(value.date).toISOString().split('T')[0]
     }
 
     await this.budgetsRepository.update({ id }, value)
