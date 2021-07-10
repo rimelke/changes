@@ -13,7 +13,6 @@ import {
 import { Form } from '@unform/web'
 import { useState, FC } from 'react'
 import { useGet } from '../hooks/useGet'
-import IBudget from '../types/IBudget'
 import ICategory from '../types/ICategory'
 
 import { Select, Input, MaskInput } from './Form'
@@ -29,9 +28,16 @@ interface IBudgetModalProps {
   disclosure: UseDisclosureReturn
   onSubmit: (data: IBudgetData) => Promise<any>
   resolveCallback?: (data: any) => void
-  initialData?: IBudget
+  initialData?: {
+    categoryId?: string
+    value?: number
+    date?: string
+    description?: string
+  }
   title: string
   buttonLabel: string
+  valueDisabled?: boolean
+  filterBy?: 'INCOME' | 'EXPENSE'
 }
 
 const BudgetModal: FC<IBudgetModalProps> = ({
@@ -40,7 +46,9 @@ const BudgetModal: FC<IBudgetModalProps> = ({
   resolveCallback = () => {},
   initialData = {},
   title,
-  buttonLabel
+  buttonLabel,
+  valueDisabled,
+  filterBy
 }) => {
   const { data: categories } = useGet<ICategory[]>('/categories')
 
@@ -84,11 +92,15 @@ const BudgetModal: FC<IBudgetModalProps> = ({
               placeholder="Selecione uma categoria"
               isRequired
               name="categoryId">
-              {categories?.map((category) => (
-                <option value={category.id} key={category.id}>
-                  {category.name}
-                </option>
-              ))}
+              {categories
+                ?.filter((category) =>
+                  filterBy ? category.type === filterBy : true
+                )
+                .map((category) => (
+                  <option value={category.id} key={category.id}>
+                    {category.name}
+                  </option>
+                ))}
             </Select>
             <Input
               mt={2}
@@ -104,6 +116,7 @@ const BudgetModal: FC<IBudgetModalProps> = ({
               isRequired
               mt={2}
               thousandSeparator="."
+              disabled={valueDisabled}
               prefix="R$ "
               placeholder="Digite o valor"
               name="value"

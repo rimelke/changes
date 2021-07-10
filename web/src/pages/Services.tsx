@@ -38,9 +38,10 @@ import withSidebar from '../hooks/withSidebar'
 import api from '../services/api'
 import INeedlewoman from '../types/INeedlewoman'
 import IService from '../types/IService'
-import { FiEye, FiEdit, FiX } from 'react-icons/fi'
+import { FiEye, FiEdit, FiX, FiDollarSign } from 'react-icons/fi'
 import IDetailedService from '../types/IDetailedService'
 import IProduct from '../types/IProduct'
+import BudgetModal from '../components/BudgetModal'
 
 interface ICreateServiceModalProps {
   isOpen: boolean
@@ -545,6 +546,7 @@ const Services = () => {
 
   const [viewService, setViewService] = useState<IService | null>(null)
   const [updateService, setUpdateService] = useState<IService | null>(null)
+  const [payingService, setPayingService] = useState<IService>()
 
   const {
     isOpen: newServiceIsOpen,
@@ -561,6 +563,7 @@ const Services = () => {
     onClose: updateServiceOnClose,
     onOpen: updateServiceOnOpen
   } = useDisclosure()
+  const payServiceDisclosure = useDisclosure()
 
   return (
     <Flex as="main" flexDir="column" flex={1} mb={8} mt={4} mr={8}>
@@ -602,6 +605,28 @@ const Services = () => {
           viewService={viewService}
         />
       )}
+
+      <BudgetModal
+        disclosure={payServiceDisclosure}
+        buttonLabel="Pagar"
+        initialData={{
+          description: `Pagamento - Serviço #${payingService?.incrementId}`,
+          value: payingService?.value,
+          date:
+            payingService?.withdrawalDate ||
+            new Date().toISOString().split('T')[0]
+        }}
+        title={`Pagar serviço - #${payingService?.incrementId}`}
+        onSubmit={(data) =>
+          api.put(`/services/pay/${payingService?.id}`, {
+            ...data,
+            value: undefined
+          })
+        }
+        resolveCallback={() => servicesMutate()}
+        valueDisabled
+        filterBy="EXPENSE"
+      />
 
       <Table mt={4} borderWidth="1px">
         <Thead>
@@ -690,6 +715,18 @@ const Services = () => {
                   }}
                   colorScheme="orange"
                   icon={<FiEdit />}
+                />
+                <IconButton
+                  aria-label="Pagar serviço"
+                  size="sm"
+                  disabled={service.isPayed}
+                  borderRadius={7}
+                  onClick={() => {
+                    payServiceDisclosure.onOpen()
+                    setPayingService(service)
+                  }}
+                  colorScheme="green"
+                  icon={<FiDollarSign />}
                 />
               </Flex>
             </Tr>
