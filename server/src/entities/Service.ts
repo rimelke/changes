@@ -7,9 +7,11 @@ import {
   OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
-  Generated
+  Generated,
+  OneToOne
 } from 'typeorm'
 import genId from '../utils/genId'
+import Budget from './Budget'
 import Needlewoman from './Needlewoman'
 import ServiceProduct from './ServiceProduct'
 
@@ -57,6 +59,13 @@ class Service {
     cascade: true
   })
   products: ServiceProduct[]
+
+  @Column({ nullable: true })
+  budgetId: string
+
+  @JoinColumn({ name: 'budgetId' })
+  @OneToOne(() => Budget)
+  budget: Budget
 
   constructor(props: Omit<Service, 'id' | 'createdAt' | 'updatedAt'>) {
     Object.assign(this, props)

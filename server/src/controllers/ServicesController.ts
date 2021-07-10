@@ -37,6 +37,16 @@ class ServicesController {
 
     res.send()
   }
+
+  async pay(req: Request, res: Response) {
+    const { id } = req.params
+
+    const servicesService = new ServicesService()
+
+    servicesService.payService(id, req.body)
+
+    res.send()
+  }
 }
 
 export default ServicesController

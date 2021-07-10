@@ -4,6 +4,7 @@ import AppError from '../errors/AppError'
 import NeedlewomansRepository from '../repositories/NeedlewomansRepository'
 import ProductsRepository from '../repositories/ProductsRepository'
 import ServicesRepository from '../repositories/ServicesRepository'
+import BudgetsService from './BudgetsService'
 
 interface ICreateServiceData {
   needlewomanId: string
@@ -37,15 +38,25 @@ interface IUpdateServiceData {
   }[]
 }
 
+interface IPayServiceData {
+  date: string
+  categoryId: string
+  description: string
+}
+
 class ServicesService {
   private servicesRepository: ServicesRepository
   private needlewomansRepository: NeedlewomansRepository
   private productsRepository: ProductsRepository
 
+  private budgetsService: BudgetsService
+
   constructor() {
     this.servicesRepository = getCustomRepository(ServicesRepository)
     this.needlewomansRepository = getCustomRepository(NeedlewomansRepository)
     this.productsRepository = getCustomRepository(ProductsRepository)
+
+    this.budgetsService = new BudgetsService()
   }
 
   getServices() {
@@ -245,6 +256,23 @@ class ServicesService {
     const updatedService = this.servicesRepository.merge(service, value)
 
     await this.servicesRepository.save(updatedService)
+  }
+
+  async payService(id: string, data: IPayServiceData) {
+    const service = await this.servicesRepository.findOne(id)
+
+    if (!service) throw new AppError('Service not found.')
+
+    if (service.isPayed) throw new AppError('Service is already payed.')
+
+    const { id: budgetId } = await this.budgetsService.createBudget({
+      ...data,
+      value: service.value,
+      referenceId: service.id,
+      referenceType: 'service'
+    })
+
+    await this.servicesRepository.update({ id }, { isPayed: true, budgetId })
   }
 }
 
