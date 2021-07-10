@@ -403,25 +403,25 @@ const Products = () => {
                   })}
                 </Td>
                 <Td isNumeric>
-                  {product.price.toLocaleString('pt-BR', {
+                  {product.price?.toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
-                  })}
+                  }) || ''}
                 </Td>
                 <Td
                   fontWeight="bold"
                   color={
-                    product.profit >= product.group.minimum
+                    product.profit && product.profit >= product.group.minimum
                       ? product.profit >= product.group.desired
                         ? 'green.500'
                         : 'yellow.500'
                       : 'red.500'
                   }
                   isNumeric>
-                  {Number(product.profit).toLocaleString('pt-br', {
+                  {product.profit?.toLocaleString('pt-br', {
                     maximumFractionDigits: 1,
                     minimumFractionDigits: 1
-                  })}
+                  }) || '- '}
                   %
                 </Td>
                 <Td isNumeric>

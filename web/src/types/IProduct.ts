@@ -6,8 +6,8 @@ interface IProduct {
   groupId: string
   name: string
   cost: number
-  price: number
-  profit: number
+  price: number | null
+  profit: number | null
   createdAt: string
   updatedAt: string
   group: IGroup
