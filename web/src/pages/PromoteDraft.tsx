@@ -40,7 +40,7 @@ const PromoteDraft = () => {
               ]
             }
           }
-          onSubmit={(data) => api.put(`/drafts/promote/${id}`)}
+          onSubmit={(data) => api.put(`/drafts/promote/${id}`, data)}
         />
       ) : (
         <>

@@ -18,6 +18,7 @@ import { Link, useHistory } from 'react-router-dom'
 import { useGet } from '../hooks/useGet'
 
 interface IProductInitialData {
+  group?: IGroup
   groupId?: string
   ref?: string
   name?: string
@@ -63,20 +64,28 @@ const ProductForm: FC<Props> = ({
   const [cost, setCost] = useState(0)
   const [baseFabrics, setBaseFabrics] = useState<IBaseFabric[]>([])
   const [baseCosts, setBaseCosts] = useState<IBaseCost[]>([])
-  const [selectedGroup, setSelectedGroup] = useState<IGroup | null>(null)
+  const [selectedGroup, setSelectedGroup] = useState<IGroup>()
   const [isLoading, setIsLoading] = useState(false)
 
   const history = useHistory()
   const toast = useToast()
 
   useEffect(() => {
-    if (initialData && initialData.costs)
-      setBaseCosts(
-        initialData.costs.map((cost, index) => ({
-          ...cost,
-          orderId: `initialData-baseCost-${index}-${cost.name}-${cost.value}`
-        }))
+    if (initialData) {
+      setSelectedGroup(
+        initialData.group ||
+          groups?.find((group) => group.id === initialData.groupId)
       )
+
+      console.log('ola')
+      if (initialData.costs)
+        setBaseCosts(
+          initialData.costs.map((cost, index) => ({
+            ...cost,
+            orderId: `initialData-baseCost-${index}-${cost.name}-${cost.value}`
+          }))
+        )
+    }
   }, [initialData])
 
   useEffect(() => {
@@ -137,7 +146,7 @@ const ProductForm: FC<Props> = ({
                 onChange={(evt) => {
                   if (groups && groups[evt.target.selectedIndex - 1]) {
                     setSelectedGroup(groups[evt.target.selectedIndex - 1])
-                  } else setSelectedGroup(null)
+                  } else setSelectedGroup(undefined)
                 }}
                 isRequired
                 flex={3}
