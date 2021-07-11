@@ -12,6 +12,7 @@ import Drafts from './pages/Drafts'
 import Categories from './pages/Categories'
 import Budgets from './pages/Budgets'
 import Services from './pages/Services'
+import PromoteDraft from './pages/PromoteDraft'
 
 const Routes: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const Routes: React.FC = () => {
         <Route path="/categories" exact component={Categories} />
         <Route path="/budgets" exact component={Budgets} />
         <Route path="/services" exact component={Services} />
+        <Route path="/drafts/promote/:id" exact component={PromoteDraft} />
       </Switch>
     </BrowserRouter>
   )

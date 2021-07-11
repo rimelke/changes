@@ -30,7 +30,7 @@ import { useGet } from '../hooks/useGet'
 import withSidebar from '../hooks/withSidebar'
 import IDetailedDraft from '../types/IDetailedDraft'
 import IDraft from '../types/IDraft'
-import { FiDownload, FiPlus, FiEdit2 } from 'react-icons/fi'
+import { FiDownload, FiPlus, FiEdit2, FiAward } from 'react-icons/fi'
 import { Button, IconButton } from '@chakra-ui/button'
 import { Dropzone, Input, Select, Textarea } from '../components/Form'
 import { Form } from '@unform/web'
@@ -38,6 +38,7 @@ import api from '../services/api'
 import { FormHandles } from '@unform/core'
 import IGroup from '../types/IGroup'
 import { useToast } from '@chakra-ui/toast'
+import { Link as RouterLink } from 'react-router-dom'
 
 const Drafts = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null)
@@ -395,6 +396,16 @@ const Drafts = () => {
                       onClick={editDraftOnOpen}
                       aria-label="Editar rascunho"
                       icon={<FiEdit2 size={18} />}
+                    />
+                    <IconButton
+                      size="xs"
+                      icon={<FiAward size={18} />}
+                      aria-label="Promover rascunho"
+                      borderRadius={7}
+                      variant="outline"
+                      colorScheme="blue"
+                      to={`/drafts/promote/${selectedDraftId}`}
+                      as={RouterLink}
                     />
                   </Stack>
                 </Flex>
